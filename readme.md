@@ -1,6 +1,22 @@
 # Species Distribution Modelling of common pests
 Project looks at most detrimental pests (measured by bushels lost between 2022 through 2024) of corn, soy, and wheat in the U.S.
 
+### To Do:
+Embed R scripts, vary the number of absences generated depending on the classifier 
+   
+**Models to implement:**  
+- RF
+- FDA
+- GAM (`pygam`)
+- CTA
+- RF
+- GLM (`statsmodels`)
+- MARS (`py-earth`)
+- GBM
+- MaxEnt (`elapid`?)
+
+Ensemble modelling
+
 ### Notes/Discussion
 1. We have chosen pests that have caused more than 1 million bushels lost in 2022, 2023, and 2024. Some of these listed pests from [Crop Protection Network](https://cropprotectionnetwork.org/) listed more general clades; we distinguished between them as much as possible and isolated the most detrimental species in these groups
 
