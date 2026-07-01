@@ -6,7 +6,7 @@ library(ggplot2)
 library(lwgeom)
 library(usmap)
 
-ncr_raw <- read.delim("northern_corn_rootworm_0003360-260623161305970\\ncr.csv", sep="\t")
+ncr_raw <- read.delim("pests/northern_corn_rootworm_0003360-260623161305970\\ncr.csv", sep="\t")
 ncr_raw <- ncr_raw[which(ncr_raw$countryCode=="US"),]
 ncr <- data.frame(matrix(ncol = 2, nrow = length(ncr_raw$decimalLongitude)))
 ncr[,1] <- ncr_raw$decimalLongitude
