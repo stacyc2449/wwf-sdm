@@ -2,9 +2,9 @@ library(terra)
 library(geodata)
 library(dismo)
 library(sf)
-library(tigris)
 library(ggplot2)
 library(lwgeom)
+library(usmap)
 
 ncr_raw <- read.delim("northern_corn_rootworm_0003360-260623161305970\\ncr.csv", sep="\t")
 ncr_raw <- ncr_raw[which(ncr_raw$countryCode=="US"),]
@@ -32,26 +32,21 @@ ncr_excl <- st_buffer(ncr_proj, dist = 200000) # distance of 200 km
 ncr_excl_zone <- st_union(ncr_excl)
 ncr_excl_zone <- st_make_valid(ncr_excl_zone)
 
-
-
-plot(ncr_excl_zone)
-
-
-us_count <- ne_countries(country = "united states of america", scale = "medium", returnclass = "sf")
-us_count <- st_make_valid(us_count)
-
-us_proj <- st_transform(us_count, crs = 102009)
+us_count <- us_map(regions = "states", exclude = c("Alaska", "Hawaii"))
+cont_us <- st_make_valid(us_count)
+us_proj <- st_transform(cont_us, crs = 102009)
 
 allowed_area <- st_difference(us_proj, ncr_excl_zone)
 
 set.seed(42)
 bg <- st_sample(allowed_area, size = 100)
+print("points generated.")
 bg <- st_transform(bg, crs = 4326)
 bg <- as.data.frame(st_coordinates(bg))
 
-allowed_area = st_transform(allowed_area, crs = 4326)
+allowed_area <- st_transform(allowed_area, crs = 4326)
 
-# continental_us <- subset(usa_all, !usa_all$NAME_1 %in% c("Alaska", "Hawaii"))
+
 
 # ncr is only lat/lon readings
 
@@ -63,9 +58,6 @@ multilayer_raster <- rast(file_list)
 # bioclim.data <- rast("chelsa_clim\\CHELSA_bio02_1981-2010_V.2.1.tif")
 ras_ras <- crop(bioclim.data, e*1.25)  # crop to bg point extent
 
-
-# bg <- randomPoints(raster(ras_ras), 100, ncr, ext=gen_e, extf = 1.25) 
-print("points generated.")
 colnames(bg) <- c('lon','lat')
 train <- rbind(ncr, bg)  # combine with presences
 print(nrow(ncr))
@@ -84,7 +76,7 @@ dataMap.ncr  <- SpatialPointsDataFrame(train[,c(2,3)], class.pa,
                                       proj4string =crs)
 
                                       # write as shp
-sf_map.ncr = st_as_sf(dataMap.ncr, c("lon", "lat"), crs = 4326)
+sf_map.ncr <- st_as_sf(dataMap.ncr, c("lon", "lat"), crs = 4326)
 st_write(sf_map.ncr, 'data/ncr.shp', 'ncr', driver='ESRI Shapefile', append = FALSE)
 
 # # plot our points
