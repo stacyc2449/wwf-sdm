@@ -6,8 +6,30 @@ library(ggplot2)
 library(lwgeom)
 library(usmap)
 
-ncr_raw <- read.delim("pests/northern_corn_rootworm_0003360-260623161305970\\ncr.csv", sep="\t")
-ncr_raw <- ncr_raw[which(ncr_raw$countryCode=="US"),]
+# arguments: raw distribution file, prevalence (0, 1, 2), name
+args <- commandArgs(trailingOnly = TRUE)
+
+if(args[2] == "0"){
+    bg_sample <- 0.1
+    bg_rep <- TRUE
+} else if(args[2] == "2"){
+    bg_sample <- 10
+    bg_rep <- FALSE
+} else {
+    bg_sample <- 1
+    bg_rep <- FALSE
+}
+
+name <- args[3]
+
+# preprocessing: US, low coordinate uncertainty, within worldclim time frame
+ncr_raw <- read.delim(args[1], sep="\t")
+ncr_raw <- ncr_raw[which(ncr_raw$countryCode == "US"), ]
+ncr_raw <- ncr_raw[which(ncr_raw$year > 1970), ]
+ncr_raw <- ncr_raw[which(!is.na(ncr_raw$decimalLatitude)), ]
+ncr_raw <- ncr_raw[which(!is.na(ncr_raw$decimalLongitude)), ]
+ncr_raw <- ncr_raw[which(ncr_raw$coordinateUncertaintyInMeters < 200000), ]
+
 ncr <- data.frame(matrix(ncol = 2, nrow = length(ncr_raw$decimalLongitude)))
 ncr[,1] <- ncr_raw$decimalLongitude
 ncr[,2] <- ncr_raw$decimalLatitude
@@ -46,23 +68,19 @@ bg <- as.data.frame(st_coordinates(bg))
 
 allowed_area <- st_transform(allowed_area, crs = 4326)
 
-
-
 # ncr is only lat/lon readings
-
-# data is all manually loaded, using CHELSA data, because geodata server is down :(
 
 file_list <- list.files(path = "worldclim", pattern = "\\.tif$", full.names = TRUE)
 multilayer_raster <- rast(file_list)
 
-# bioclim.data <- rast("chelsa_clim\\CHELSA_bio02_1981-2010_V.2.1.tif")
-ras_ras <- crop(bioclim.data, e*1.25)  # crop to bg point extent
+bioclim.data <- rast("chelsa_clim\\CHELSA_bio02_1981-2010_V.2.1.tif")
+ras_ras <- crop(multilayer_raster, e*1.25)  # crop to bg point extent
 
 colnames(bg) <- c('lon','lat')
 train <- rbind(ncr, bg)  # combine with presences
 print(nrow(ncr))
 pa_train <- c(rep(1, nrow(ncr)), rep(0, nrow(bg))) # col of ones and zeros
-print(nrow(bg))
+print(bg)
 
 #final dataframe
 train <- data.frame(cbind(CLASS=pa_train, train))
@@ -80,7 +98,6 @@ sf_map.ncr <- st_as_sf(dataMap.ncr, c("lon", "lat"), crs = 4326)
 st_write(sf_map.ncr, 'data/ncr.shp', 'ncr', driver='ESRI Shapefile', append = FALSE)
 
 # # plot our points
-plot(ras_ras, main='NCR Presence and Absence')
-points(bg, col='red', pch = 16,cex=.3)
-points(ncr, col='black', pch = 16,cex=.3)
-plot(wrld_smpl, add=TRUE, border='dark grey')
+plot(bioclim.data, main='NCR Presence and Absence')
+points(bg, col='red', pch = 16, cex = .3)
+points(ncr, col='black', pch = 16, cex = .3)
