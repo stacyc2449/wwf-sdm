@@ -61,7 +61,7 @@ us_proj <- st_transform(cont_us, crs = 102009)
 allowed_area <- st_difference(us_proj, ncr_excl_zone)
 
 set.seed(42)
-bg <- st_sample(allowed_area, size = 100)
+bg <- st_sample(allowed_area, size = 1000)
 print("points generated.")
 bg <- st_transform(bg, crs = 4326)
 bg <- as.data.frame(st_coordinates(bg))
