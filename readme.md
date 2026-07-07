@@ -17,6 +17,8 @@ Embed R scripts, vary the number of absences generated depending on the classifi
 
 Ensemble modelling
 
+Including soil/more bioclimactic variables?
+
 ### Notes/Discussion
 1. We have chosen pests that have caused more than 1 million bushels lost in 2022, 2023, and 2024. Some of these listed pests from [Crop Protection Network](https://cropprotectionnetwork.org/) listed more general clades; we distinguished between them as much as possible and isolated the most detrimental species in these groups
 
