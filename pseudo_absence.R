@@ -49,7 +49,7 @@ ncr_sf <- st_as_sf(ncr, coords = c("lon", "lat"), crs = 4326)
 #crs 102009 corresponds to us projection, in meters
 ncr_proj <- st_transform(ncr_sf, crs = 102009)
 
-ncr_excl <- st_buffer(ncr_proj, dist = 200000) # distance of 200 km
+ncr_excl <- st_buffer(ncr_proj, dist = 100000) # distance of 200 km
 
 ncr_excl_zone <- st_union(ncr_excl)
 ncr_excl_zone <- st_make_valid(ncr_excl_zone)
