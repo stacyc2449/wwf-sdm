@@ -5,6 +5,7 @@ library(sf)
 library(ggplot2)
 library(lwgeom)
 library(usmap)
+library(rnaturalearth)
 
 # arguments: raw distribution file, prevalence (0, 1, 2), name
 args <- commandArgs(trailingOnly = TRUE)
@@ -24,7 +25,7 @@ name <- args[3]
 
 # preprocessing: US, low coordinate uncertainty, within worldclim time frame
 ncr_raw <- read.delim(args[1], sep="\t")
-ncr_raw <- ncr_raw[which(ncr_raw$countryCode == "US"), ]
+ncr_raw <- ncr_raw[which(ncr_raw$countryCode %in% c("US", "CA")), ]
 ncr_raw <- ncr_raw[which(ncr_raw$year > 1970), ]
 ncr_raw <- ncr_raw[which(!is.na(ncr_raw$decimalLatitude)), ]
 ncr_raw <- ncr_raw[which(!is.na(ncr_raw$decimalLongitude)), ]
@@ -35,7 +36,8 @@ ncr[,1] <- ncr_raw$decimalLongitude
 ncr[,2] <- ncr_raw$decimalLatitude
 
 # study area extent for ncr presences
-e <- ext(-125, -66.9, 24.5, 49.4)
+# e <- ext(-125, -66.9, 24.5, 49.4)
+e <- ext(-170.0, -52.0, 25.0, 83.5)
 
 ncr <- unique(ncr) # remove duplicates
 ncr <- ncr[complete.cases(ncr),] # remove na's
@@ -54,8 +56,13 @@ ncr_excl <- st_buffer(ncr_proj, dist = 100000) # distance of 200 km
 ncr_excl_zone <- st_union(ncr_excl)
 ncr_excl_zone <- st_make_valid(ncr_excl_zone)
 
-us_count <- us_map(regions = "states", exclude = c("Alaska", "Hawaii"))
-cont_us <- st_make_valid(us_count)
+# us_count <- us_map(regions = "states", exclude = c("Alaska", "Hawaii"))
+states_provinces <- ne_states(
+  country = c("United States of America", "Canada"),
+  returnclass = "sf"
+)
+
+cont_us <- st_make_valid(states_provinces)
 us_proj <- st_transform(cont_us, crs = 102009)
 
 allowed_area <- st_difference(us_proj, ncr_excl_zone)
