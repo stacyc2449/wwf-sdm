@@ -35,7 +35,7 @@ files_list = ["nst_pest_sightings\\bean_leaf_beetle_0003221-260623161305970\\000
               "nst_pest_sightings\\bird_cherry_aphid_0003207-260623161305970\\0003207-260623161305970.csv",
               "nst_pest_sightings\\black_cutworm_0003212-260623161305970\\0003212-260623161305970.csv",
             #   "nst_pest_sightings\\corn_leaf_aphid_0003215-260623161305970\\0003215-260623161305970.csv",
-              "nst_pest_sightings\\differential_grasshopper_observations-752834.csv\\observations-752834.csv",
+              "nst_pest_sightings\\differential_grasshopper0032387-260623161305970\\0032387-260623161305970.csv",
             #   "nst_pest_sightings\\european_corn_borer0003385-260623161305970\\0003385-260623161305970.csv",
               "nst_pest_sightings\\green_stink_0005409-260623161305970\\0005409-260623161305970.csv",
             #   "nst_pest_sightings\\hessian_fly_0003394-260623161305970\\0003394-260623161305970.csv",
@@ -45,8 +45,8 @@ files_list = ["nst_pest_sightings\\bean_leaf_beetle_0003221-260623161305970\\000
               "nst_pest_sightings\\seedcorn_maggot_0003200-260623161305970\\0003200-260623161305970.csv",
               "nst_pest_sightings\\southern_green_stink_0003348-260623161305970\\0003348-260623161305970.csv",
               "nst_pest_sightings\\three_cornered_alfalfa_0003390-260623161305970\\0003390-260623161305970.csv",
-              "nst_pest_sightings\\true_armyworm\\armyworm_moth_observations-752830.csv",
-            #   "nst_pest_sightings\\two_striped_grasshopper_observations-752841.csv\\observations-752841.csv",
+              "nst_pest_sightings\true_armyworm0032387-260623161305970\\0032387-260623161305970.csv",
+              "nst_pest_sightings\\two_striped_grasshopper0032397-260623161305970\\0032397-260623161305970.csv",
               "nst_pest_sightings\\western_corn_rootworm_0003372-260623161305970\\0003372-260623161305970.csv"
               ]
 
@@ -66,33 +66,36 @@ command_bc = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\b
            files_list[2], "2", "blackcutworm"]
 
 command_dg = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "2", "differentialgrasshopper"]
+           files_list[3], "2", "differentialgrasshopper"]
 
 command_gs = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "2", "greenStink"]
+           files_list[4], "2", "greenStink"]
 
 command_jb = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "2", "japanesebeetle"]
+           files_list[5], "2", "japanesebeetle"]
 
 command_ncr = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "2", "northerncornrootworm"]
+           files_list[6], "2", "northerncornrootworm"]
 
 command_sm = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "2", "seedcornmaggot"]
+           files_list[7], "2", "seedcornmaggot"]
 
 command_sgs = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "2", "southerngreenstink"]
+           files_list[8], "2", "southerngreenstink"]
 
 command_tca = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "2", "threecornerneredalfalfa"]
+           files_list[9], "2", "threecornerneredalfalfa"]
 
 command_ta = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "2", "truearmyworm"]
+           files_list[10], "2", "truearmyworm"]
+
+command_tsg = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
+           files_list[11], "2", "truearmyworm"]
 
 command_wcr = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "2", "westcornrootworm"]
+           files_list[12], "2", "westcornrootworm"]
 
-command_list = [command_blb, command_bca, command_bc, command_dg, command_gs, command_jb, command_ncr, command_sm, command_sgs, command_tca, command_ta, command_wcr]
+command_list = [command_blb, command_bca, command_bc, command_dg, command_gs, command_jb, command_ncr, command_sm, command_sgs, command_tca, command_ta, command_tsg, command_wcr]
 
 for command in command_list:
     try:
@@ -237,8 +240,8 @@ print("Train balanced accuracy:", balanced_accuracy_score(train_y, lgbm_train_pr
 print("Test balanced accuracy:", balanced_accuracy_score(test_y, lgbm_test_pred))
 
 ## MARS ###
-mars = make_pipeline(SplineTransformer(degree=1, n_knots=10, include_bias=False), LinearRegression())
-mars_accuracy_scores = model_selection.cross_val_score(mars, train_x, train_y, cv = kf, scoring='accuracy')
+mars = make_pipeline(SplineTransformer(degree=1, n_knots=10, include_bias=False), LogisticRegression())
+mars_accuracy_scores = model_selection.cross_val_score(mars, train_x, train_y, cv = kf, scoring='balanced_accuracy')
 print("mars %d-fold Cross Validation Accuracy: %0.2f (+/- %0.2f)"
           % (k, mars_accuracy_scores.mean() * 100, mars_accuracy_scores.std() * 200))
 mars.fit(train_x, train_y)
@@ -246,6 +249,21 @@ mars_train_pred = mars.predict(train_x)
 mars_test_pred = mars.predict(test_x)
 print("Train balanced accuracy:", balanced_accuracy_score(train_y, mars_train_pred))
 print("Test balanced accuracy:", balanced_accuracy_score(test_y, mars_test_pred))
+
+### MAXENT ###
+maxent = MaxentModel()
+maxent_accuracy_scores = model_selection.cross_val_score(maxent, train_x, train_y, cv = kf, scoring='roc_auc')
+print("maxent %d-fold Cross Validation Accuracy: %0.2f (+/- %0.2f)"
+          % (k, maxent_accuracy_scores.mean() * 100, maxent_accuracy_scores.std() * 200))
+maxent.fit(train_x, train_y)
+maxent_train_scores = maxent.predict(train_x)
+maxent_test_scores = maxent.predict(test_x)
+
+maxent_train_pred = (maxent_train_scores >= 0.5).astype(int)
+maxent_test_pred = (maxent_test_scores >= 0.5).astype(int)
+
+print("Train balanced accuracy:", balanced_accuracy_score(train_y, maxent_train_pred))
+print("Test balanced accuracy:", balanced_accuracy_score(test_y, maxent_test_pred))
 
 
 
