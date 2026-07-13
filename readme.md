@@ -13,20 +13,27 @@ Project looks at most detrimental pests (measured by bushels lost between 2022 t
 - GBM
 - MaxEnt (`elapid`?)
 
-Embed R scripts, vary the number of absences generated
-### To Do:
-Assign classifiers to each type of absence generation
-   
-Ensemble modelling
-
-Including soil/more bioclimactic variables?
+Embed R scripts, vary the number of absences generated - this mightve actually been detrimental to accuracy
 
 Resolve ocean presence generation
 
+### To Do:
+Assign classifiers to each type of absence generation
+
+Display data better
+   
+Ensemble modelling
+
+Implement thresholds with max sss
+
+Including soil/more bioclimactic variables?
+
 Investigating field studies of NST efficacy in areas with known infestations
 
+Possibly generate pseudo absence points using environmentally stratified methods
+
 ### Notes/Discussion
-1. We have chosen pests that have caused more than 1 million bushels lost in 2022, 2023, and 2024. Some of these listed pests from [Crop Protection Network](https://cropprotectionnetwork.org/) listed more general clades; we distinguished between them as much as possible and isolated the most detrimental species in these groups
+1. We have chosen pests that have caused more than 1 million bushels lost in 2022, 2023, and 2024. Some of these listed pests from [Crop Protection Network](https://cropprotectionnetwork.org/) are more general clades; we distinguished between them as much as possible and isolated the most detrimental species in these groups
 
 2. Some insecticides may be effective but not tested against certain species, or commercially advertised to.
 
