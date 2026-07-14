@@ -17,14 +17,14 @@ Embed R scripts, vary the number of absences generated - this mightve actually b
 
 Resolve ocean presence generation
 
+Implement thresholds with max sss
+
 ### To Do:
 Assign classifiers to each type of absence generation
 
 Display data better
    
 Ensemble modelling
-
-Implement thresholds with max sss
 
 Including soil/more bioclimactic variables?
 
