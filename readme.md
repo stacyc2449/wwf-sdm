@@ -23,16 +23,15 @@ Implement thresholds with max sss
 Assign classifiers to each type of absence generation
 
 Find a method to choose models for ensemble modelling - auc and tss
-
-Display data better
    
 Ensemble modelling
 
-Including soil/more bioclimactic variables?
+Investigating field studies of NST efficacy in areas with known infestations  
 
-Investigating field studies of NST efficacy in areas with known infestations
-
-Possibly generate pseudo absence points using environmentally stratified methods
+### Backburner
+Possibly generate pseudo absence points using environmentally stratified methods   
+Display data better   
+Including soil/more bioclimactic variables?   
 
 ### Notes/Discussion
 1. We have chosen pests that have caused more than 1 million bushels lost in 2022, 2023, and 2024. Some of these listed pests from [Crop Protection Network](https://cropprotectionnetwork.org/) are more general clades; we distinguished between them as much as possible and isolated the most detrimental species in these groups
@@ -52,5 +51,7 @@ We choose to only stick with GBIF datasets because they were the most extensive,
 The goal is to predict the new expanded range of overwintering sites for common pests, and compare it with areas where neonics application is largely unregulated and legalized. This will provide new recommended places where neonics should be, and shouldn't be applied, because of the detriment that neonics contribute to the environment, such as pollinator death and decreased biodiversity, as well as making it more likely for common pests to develop a resistance to these insecticides.
 
 ### Using this repository
-This repository features the codebase and a very sparse amount of data. The data will be made available soon, it is currently absent for pushing/pulling efficiency.   
+This repository features the codebase and a very sparse amount of data. The data will be made available soon, it is currently absent for pushing/pulling efficiency. 
+
+
 Updated July 14, 2026
