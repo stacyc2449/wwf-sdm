@@ -22,6 +22,8 @@ Implement thresholds with max sss
 ### To Do:
 Assign classifiers to each type of absence generation
 
+Find a method to choose models for ensemble modelling - auc and tss
+
 Display data better
    
 Ensemble modelling
@@ -50,5 +52,5 @@ We choose to only stick with GBIF datasets because they were the most extensive,
 The goal is to predict the new expanded range of overwintering sites for common pests, and compare it with areas where neonics application is largely unregulated and legalized. This will provide new recommended places where neonics should be, and shouldn't be applied, because of the detriment that neonics contribute to the environment, such as pollinator death and decreased biodiversity, as well as making it more likely for common pests to develop a resistance to these insecticides.
 
 ### Using this repository
-This repository features the codebase and a very sparse amount of data. The data will be made available soon, it is currently absent for pushing/pulling efficiency.
-Updated July 10, 2026
+This repository features the codebase and a very sparse amount of data. The data will be made available soon, it is currently absent for pushing/pulling efficiency.   
+Updated July 14, 2026
