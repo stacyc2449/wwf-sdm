@@ -19,12 +19,14 @@ Resolve ocean presence generation
 
 Implement thresholds with max sss
 
+Find a method to choose models for ensemble modelling - auc and tss
+
 ### To Do:
 Assign classifiers to each type of absence generation
 
-Find a method to choose models for ensemble modelling - auc and tss
+Figure out what the continuous boyce index is and how that might be helpful
    
-Ensemble modelling
+Ensemble modelling - how do you choose 3 models?
 
 Investigating field studies of NST efficacy in areas with known infestations  
 
@@ -54,4 +56,4 @@ The goal is to predict the new expanded range of overwintering sites for common 
 This repository features the codebase and a very sparse amount of data. The data will be made available soon, it is currently absent for pushing/pulling efficiency. 
 
 
-Updated July 14, 2026
+Updated July 16, 2026
