@@ -77,12 +77,6 @@ files_list = ["nst_pest_sightings\\bean_leaf_beetle_0003221-260623161305970\\000
               "nst_pest_sightings\\western_corn_rootworm_0003372-260623161305970\\0003372-260623161305970.csv"
               ]
 
-for file in files_list:
-    with open(file, mode='r', encoding='utf-8') as file:
-        row_count = sum(1 for line in file)
-
-    print(f"{file}, Total lines: {row_count}")
-
 # Run the subprocess, R code to generate pseudo absences. Will be customized depending on the models
 def plotit(x, title, colors, cmap="Blues"):
     x = np.asarray(x)
@@ -117,7 +111,7 @@ def plotit(x, title, colors, cmap="Blues"):
 
 
 command_blb = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[0], "northerncorn"]
+           files_list[0], "beanleafbeetle"]
 
 command_bca = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
            files_list[1], "birdcherryaphid"]
@@ -155,9 +149,9 @@ command_tsg = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\
 command_wcr = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
            files_list[12], "westcornrootworm"]
 
-command_list = [command_dg, command_gs, command_jb, command_ncr, command_sm, command_sgs, command_tca, command_ta, command_tsg, command_wcr]
+command_list = [command_blb, command_bca, command_bc, command_dg, command_gs, command_jb, command_ncr, command_sm, command_sgs, command_tca, command_ta, command_tsg, command_wcr]
 
-# command_blb, command_bca, command_bc, already done 
+#   already done 
 # loading future prediction
 future_stacks = ["worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp126_2021-2040.tif", "worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp245_2021-2040.tif",
                     "worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp370_2021-2040.tif", "worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp585_2021-2040.tif"]
@@ -185,6 +179,7 @@ future_band_map = {
     "bio5": 5,
     "bio6": 6
 }
+
 min_lon = -170
 max_lon = -52
 min_lat = 24
@@ -241,7 +236,7 @@ for index, stack in enumerate(future_40_stacks):
     #     'future_split_bands_1/future_bio*.tif')) 
 
 
-print(future_ras_feats)
+print("future ras feats loaded.")
 
 for command in command_list:
     try:
@@ -259,7 +254,7 @@ for command in command_list:
     #     shutil.copy(f, 'inputs/')
 
     ncr_gdf_mid = gpd.GeoDataFrame.from_file('data/' + command[3] + '/mid.shp')
-    ncr_gdf_high = gpd.GeoDataFrame.from_file('data/' + command[3] + '/high.shp')
+    # ncr_gdf_high = gpd.GeoDataFrame.from_file('data/' + command[3] + '/high.shp')
 
     # Checking duplicates and NA values. Coordinate reference system should ideally be epsg: 4326
 
@@ -268,10 +263,10 @@ for command in command_list:
     print("Coordinate reference system: {}".format(ncr_gdf_mid.crs))
     print("{} observations with {} columns".format(*ncr_gdf_mid.shape))
 
-    print("Number of duplicates: ", ncr_gdf_high.duplicated(subset='geometry', keep='first').sum())
-    print("Number of NA's: ", ncr_gdf_high['geometry'].isna().sum())
-    print("Coordinate reference system: {}".format(ncr_gdf_high.crs))
-    print("{} observations with {} columns".format(*ncr_gdf_high.shape))
+    # print("Number of duplicates: ", ncr_gdf_high.duplicated(subset='geometry', keep='first').sum())
+    # print("Number of NA's: ", ncr_gdf_high['geometry'].isna().sum())
+    # print("Coordinate reference system: {}".format(ncr_gdf_high.crs))
+    # print("{} observations with {} columns".format(*ncr_gdf_high.shape))
     # Mapping the species presences (pa == 1)
 
     ncr_gdf_mid[ncr_gdf_mid.CLASS == 1].plot(marker='*', color='green', markersize=5)
@@ -301,7 +296,7 @@ for command in command_list:
         raster_crs = src.crs
 
     ncr_gdf_mid = ncr_gdf_mid.to_crs(raster_crs)
-    ncr_gdf_high = ncr_gdf_high.to_crs(raster_crs)
+    # ncr_gdf_high = ncr_gdf_high.to_crs(raster_crs)
 
     ncr_gdf_low = []
     for i in range(1,11):
@@ -337,35 +332,35 @@ for command in command_list:
 
     print(train_x_mid)
 
-    train_xs_high, train_ys_high = load_training_vector(ncr_gdf_high, ras_feats, response_field='CLASS')
+    # train_xs_high, train_ys_high = load_training_vector(ncr_gdf_high, ras_feats, response_field='CLASS')
 
-    x_df_high = pd.DataFrame(train_xs_high)
-    x_df_high = x_df_high.apply(pd.to_numeric, errors="coerce")
-    x_df_high = x_df_high.replace([np.inf, -np.inf], np.nan)
+    # x_df_high = pd.DataFrame(train_xs_high)
+    # x_df_high = x_df_high.apply(pd.to_numeric, errors="coerce")
+    # x_df_high = x_df_high.replace([np.inf, -np.inf], np.nan)
 
-    y_ser_high = pd.Series(train_ys_high)
+    # y_ser_high = pd.Series(train_ys_high)
 
-    mask_high = x_df_high.notna().all(axis=1) & y_ser_high.notna()
+    # mask_high = x_df_high.notna().all(axis=1) & y_ser_high.notna()
 
-    # Apply mask_mid to both X and y
-    train_xs_high_clean = x_df_high.loc[mask_high].to_numpy(dtype=float)
-    train_ys_high_clean = y_ser_high.loc[mask_high].to_numpy()
+    # # Apply mask_mid to both X and y
+    # train_xs_high_clean = x_df_high.loc[mask_high].to_numpy(dtype=float)
+    # train_ys_high_clean = y_ser_high.loc[mask_high].to_numpy()
 
-    print("Original samples:", len(train_xs_high))
-    print("Clean samples:", len(train_xs_high_clean))
-    print("Dropped samples:", len(train_xs_high) - len(train_xs_high_clean))
+    # print("Original samples:", len(train_xs_high))
+    # print("Clean samples:", len(train_xs_high_clean))
+    # print("Dropped samples:", len(train_xs_high) - len(train_xs_high_clean))
 
 
-    train_x_high, test_x_high, train_y_high, test_y_high = model_selection.train_test_split(train_xs_high_clean, train_ys_high_clean, test_size=0.25, random_state=42, stratify=train_ys_high_clean)
+    # train_x_high, test_x_high, train_y_high, test_y_high = model_selection.train_test_split(train_xs_high_clean, train_ys_high_clean, test_size=0.25, random_state=42, stratify=train_ys_high_clean)
     # train_xs_mid.shape, train_ys_mid.shape
-    train_x_high.shape, test_x_high.shape, train_y_high.shape, test_y_high.shape
+    # train_x_high.shape, test_x_high.shape, train_y_high.shape, test_y_high.shape
 
     # Classifier implementation
 
     
 
     sample_weights_mid = compute_sample_weight(class_weight='balanced', y=train_y_mid)
-    sample_weights_high = compute_sample_weight(class_weight='balanced', y=train_y_high)
+    # sample_weights_high = compute_sample_weight(class_weight='balanced', y=train_y_high)
     k = 10
     kf = model_selection.KFold(n_splits=k, shuffle=True, random_state=42)
 
@@ -402,7 +397,7 @@ for command in command_list:
 
     me = make_model_dict("maxent", MaxentModel())
 
-    gam = make_model_dict("log gam", LogisticGAM(s(0) + s(1) + s(2)))
+    gam = make_model_dict("log gam", LogisticGAM(s(0) + s(1) + s(2), lam=10))
 
     models = [rf, lda, dtc, lr, lr1, xgb, mars, me, gam]
 
@@ -605,18 +600,19 @@ for command in command_list:
         pred_to_write = pred_raster.astype("float32")
         pred_to_write = np.where(np.isnan(pred_to_write), -9999, pred_to_write)
 
-        with rasterio.open("outputs/prediction" + ssp[index] + "_ensemble.tif", "w", **profile) as dst:
+        os.makedirs(os.path.dirname("outputs/" + command[3]), exist_ok=True)
+        with rasterio.open("outputs/" + command[3] + "/prediction_" + command[3] + "_" + ssp[index] + "_ensemble.tif", "w", **profile) as dst:
             dst.write(pred_to_write, 1)
             dst.set_band_description(1, "prediction")
 
-    distr_rf_pred_245 = rasterio.open("outputs/prediction126_ensemble.tif").read(1)
+    distr_rf_pred_245 = rasterio.open("outputs/" + command[3] + "/prediction_" + command[3] + "_126" + "_ensemble.tif").read(1)
     plotit(distr_rf_pred_245, command[3] + ', 126', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")
 
-    distr_rf_pred_245 = rasterio.open("outputs/prediction245_ensemble.tif").read(1)
+    distr_rf_pred_245 = rasterio.open("outputs/" + command[3] + "/prediction_" + command[3] + "_245" + "_ensemble.tif").read(1)
     plotit(distr_rf_pred_245, command[3] + '245', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")
 
-    distr_rf_pred_245 = rasterio.open("outputs/prediction370_ensemble.tif").read(1)
+    distr_rf_pred_245 = rasterio.open("outputs/" + command[3] + "/prediction_" + command[3] + "_370" + "_ensemble.tif").read(1)
     plotit(distr_rf_pred_245, command[3] + '370', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")
 
-    distr_rf_pred_245 = rasterio.open("outputs/prediction585_ensemble.tif").read(1)
+    distr_rf_pred_245 = rasterio.open("outputs/" + command[3] + "/prediction_" + command[3] + "_585" + "_ensemble.tif").read(1)
     plotit(distr_rf_pred_245, command[3] + '585', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")

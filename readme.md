@@ -25,6 +25,12 @@ Find a method to choose models for ensemble modelling - auc and tss
 Assign classifiers to each type of absence generation
 
 Figure out what the continuous boyce index is and how that might be helpful
+
+spatial blocking cross validation, possibly through verde scikit - this may reduce sampling bias
+
+WE MUST MITIGATE SAMPLING BIAS
+
+myabe also thin the presence sightings within 10km of each other?
    
 Ensemble modelling - how do you choose 3 models?
 
