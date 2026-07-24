@@ -21,10 +21,18 @@ Implement thresholds with max sss
 
 Find a method to choose models for ensemble modelling - auc and tss
 
-### To Do:
 Assign classifiers to each type of absence generation
 
-Figure out what the continuous boyce index is and how that might be helpful
+Ensemble modelling - how do you choose 3 models?
+
+Display data better 
+
+### To Do:
+I really don't like modifying the R script to include nonexistent uncertainty.... but that is the only way seedcorn maggot sightings will work...
+
+Solution: run all of them, with seedcorn maggots being the only exception
+
+Make gif setup of the spreading range over the course of the next few decades
 
 spatial blocking cross validation, possibly through verde scikit - this may reduce sampling bias
 
@@ -32,14 +40,17 @@ WE MUST MITIGATE SAMPLING BIAS
 
 myabe also thin the presence sightings within 10km of each other?
    
-Ensemble modelling - how do you choose 3 models?
+
 
 Investigating field studies of NST efficacy in areas with known infestations  
 
+
+
 ### Backburner
 Possibly generate pseudo absence points using environmentally stratified methods   
-Display data better   
-Including soil/more bioclimactic variables?   
+  
+Including soil/more bioclimactic variables?  
+Figure out what the continuous boyce index is and how that might be helpful 
 
 ### Notes/Discussion
 1. We have chosen pests that have caused more than 1 million bushels lost in 2022, 2023, and 2024. Some of these listed pests from [Crop Protection Network](https://cropprotectionnetwork.org/) are more general clades; we distinguished between them as much as possible and isolated the most detrimental species in these groups

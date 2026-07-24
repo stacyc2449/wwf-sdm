@@ -23,7 +23,9 @@ ncr_raw <- ncr_raw[which(ncr_raw$countryCode %in% c("US", "CA")), ]
 ncr_raw <- ncr_raw[which(ncr_raw$year > 1970), ]
 ncr_raw <- ncr_raw[which(!is.na(ncr_raw$decimalLatitude)), ]
 ncr_raw <- ncr_raw[which(!is.na(ncr_raw$decimalLongitude)), ]
-ncr_raw <- ncr_raw[which(ncr_raw$coordinateUncertaintyInMeters < 200000), ]
+
+#### CHANGE THIS LINE IF DESIRED
+ncr_raw <- ncr_raw[which(ncr_raw$coordinateUncertaintyInMeters < 200000 | is.na(ncr_raw$coordinateUncertaintyInMeters)), ]
 
 ncr <- data.frame(matrix(ncol = 2, nrow = length(ncr_raw$decimalLongitude)))
 ncr[,1] <- ncr_raw$decimalLongitude
@@ -79,7 +81,7 @@ allowed_area <- st_transform(allowed_area, crs = 4326)
 
 # ncr is only lat/lon readings
 
-file_list <- list.files(path = "worldclim", pattern = "\\.tif$", full.names = TRUE)
+file_list <- list.files(path = "chelsa_clim", pattern = "\\.tif$", full.names = TRUE)
 multilayer_raster <- rast(file_list)
 
 # bioclim.data <- rast("chelsa_clim\\CHELSA_bio02_1981-2010_V.2.1.tif")
@@ -153,6 +155,6 @@ for (i in 1:10){
 
 
 # # plot our points
-plot(ras_ras, main='NCR Presence and Absence')
-points(bg_mid, col='red', pch = 16, cex = .3)
-points(ncr, col='black', pch = 16, cex = .3)
+# plot(ras_ras, main='NCR Presence and Absence')
+# points(bg_mid, col='red', pch = 16, cex = .3)
+# points(ncr, col='black', pch = 16, cex = .3)
