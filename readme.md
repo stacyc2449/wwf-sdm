@@ -27,6 +27,10 @@ Ensemble modelling - how do you choose 3 models?
 
 Display data better 
 
+WE MUST MITIGATE SAMPLING BIAS
+
+myabe also thin the presence sightings within ~~10km~~ 5 km of each other?
+
 ### To Do:
 I really don't like modifying the R script to include nonexistent uncertainty.... but that is the only way seedcorn maggot sightings will work...
 
@@ -35,12 +39,6 @@ Solution: run all of them, with seedcorn maggots being the only exception
 Make gif setup of the spreading range over the course of the next few decades
 
 spatial blocking cross validation, possibly through verde scikit - this may reduce sampling bias
-
-WE MUST MITIGATE SAMPLING BIAS
-
-myabe also thin the presence sightings within 10km of each other?
-   
-
 
 Investigating field studies of NST efficacy in areas with known infestations  
 

@@ -1,7 +1,7 @@
-Sys.setenv(OMP_NUM_THREADS = "4")
-Sys.setenv(OPENBLAS_NUM_THREADS = "4")
-Sys.setenv(MKL_NUM_THREADS = "4")
-Sys.setenv(VECLIB_MAXIMUM_THREADS = "4")
+Sys.setenv(OMP_NUM_THREADS = "8")
+Sys.setenv(OPENBLAS_NUM_THREADS = "8")
+Sys.setenv(MKL_NUM_THREADS = "8")
+Sys.setenv(VECLIB_MAXIMUM_THREADS = "8")
 
 library(terra)
 library(geodata)
@@ -11,6 +11,7 @@ library(ggplot2)
 library(lwgeom)
 library(usmap)
 library(rnaturalearth)
+library(spThin)
 
 # arguments: raw distribution file, prevalence (0, 1, 2), name
 args <- commandArgs(trailingOnly = TRUE)
@@ -27,9 +28,10 @@ ncr_raw <- ncr_raw[which(!is.na(ncr_raw$decimalLongitude)), ]
 #### CHANGE THIS LINE IF DESIRED
 ncr_raw <- ncr_raw[which(ncr_raw$coordinateUncertaintyInMeters < 200000 | is.na(ncr_raw$coordinateUncertaintyInMeters)), ]
 
-ncr <- data.frame(matrix(ncol = 2, nrow = length(ncr_raw$decimalLongitude)))
+ncr <- data.frame(matrix(ncol = 3, nrow = length(ncr_raw$decimalLongitude)))
 ncr[,1] <- ncr_raw$decimalLongitude
 ncr[,2] <- ncr_raw$decimalLatitude
+ncr[,3] <- ncr_raw$verbatimScientificName
 
 # study area extent for ncr presences
 # e <- ext(-125, -66.9, 24.5, 49.4)
@@ -37,12 +39,28 @@ e <- ext(-170.0, -52.0, 25.0, 83.5)
 
 ncr <- unique(ncr) # remove duplicates
 ncr <- ncr[complete.cases(ncr),] # remove na's
-colnames(ncr) <- c('lon','lat')
+colnames(ncr) <- c('lon','lat', 'species')
 
 ncr <- ncr[which(ncr$lon>=e[1] & ncr$lon<=e[2]),]
 ncr <- ncr[which(ncr$lat>=e[3] & ncr$lat<=e[4]),]
 
-ncr_sf <- st_as_sf(ncr, coords = c("lon", "lat"), crs = 4326)
+thin_results <- thin(
+                     loc.data = ncr,
+                     lat.col = "lat",
+                     long.col = "lon",
+                     spec.col = "species",
+                     thin.par = 5,
+                     reps = 10,
+                     locs.thinned.list.return = TRUE,
+                     write.files = FALSE)
+
+best_i <- which.max(sapply(thin_results, nrow))
+ncr_thin <- thin_results[[best_i]]
+
+names(ncr_thin)[names(ncr_thin) == "Longitude"] <- "lon"
+names(ncr_thin)[names(ncr_thin) == "Latitude"] <- "lat"
+
+ncr_sf <- st_as_sf(ncr_thin, coords = c("lon", "lat"), crs = 4326)
 
 #crs 102009 corresponds to us projection, in meters
 ncr_proj <- st_transform(ncr_sf, crs = 102009)
@@ -90,12 +108,12 @@ ras_ras <- crop(multilayer_raster, e*1.25)  # crop to bg point extent
 colnames(bg_mid) <- c('lon','lat')
 colnames(bg_high) <- c('lon', 'lat')
 
-train_mid <- rbind(ncr, bg_mid)  # combine with presences
-train_high <- rbind(ncr, bg_high)
+train_mid <- rbind(ncr_thin, bg_mid)  # combine with presences
+train_high <- rbind(ncr_thin, bg_high)
 
 # print(nrow(ncr))
-pa_train_mid <- c(rep(1, nrow(ncr)), rep(0, nrow(bg_mid))) # col of ones and zeros
-pa_train_high <- c(rep(1, nrow(ncr)), rep(0, nrow(bg_high)))
+pa_train_mid <- c(rep(1, nrow(ncr_thin)), rep(0, nrow(bg_mid))) # col of ones and zeros
+pa_train_high <- c(rep(1, nrow(ncr_thin)), rep(0, nrow(bg_high)))
 # print(bg_mid)
 
 #final dataframe
@@ -136,8 +154,8 @@ for (i in 1:10){
     bg_low <- st_transform(bg_low, crs = 4326)
     bg_low <- as.data.frame(st_coordinates(bg_low))
     colnames(bg_low) <- c('lon', 'lat')
-    train_low <- rbind(ncr, bg_low)
-    pa_train_low <- c(rep(1, nrow(ncr)), rep(0, nrow(bg_low)))
+    train_low <- rbind(ncr_thin, bg_low)
+    pa_train_low <- c(rep(1, nrow(ncr_thin)), rep(0, nrow(bg_low)))
     train_low <- data.frame(cbind(CLASS=pa_train_low, train_low))
 
     train_low <- train_low[sample(nrow(train_low)), ]
