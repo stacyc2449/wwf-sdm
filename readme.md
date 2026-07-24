@@ -31,31 +31,36 @@ WE MUST MITIGATE SAMPLING BIAS
 
 myabe also thin the presence sightings within ~~10km~~ 5 km of each other?
 
+check pearsons correlation coeeff
+
+Investigating field studies of NST efficacy in areas with known infestations (sorta done? will end up being done in discussion)
+
 ### To Do:
 I really don't like modifying the R script to include nonexistent uncertainty.... but that is the only way seedcorn maggot sightings will work...
 
 Solution: run all of them, with seedcorn maggots being the only exception
 
-Make gif setup of the spreading range over the course of the next few decades
-
-spatial blocking cross validation, possibly through verde scikit - this may reduce sampling bias
-
-Investigating field studies of NST efficacy in areas with known infestations  
+Make gif setup of the spreading range over the course of the next few decades 
 
 clean up the month range of each pest based on crop
 
-check pearsons correlation coeeff
+current bio vars are not that cooked, but try the new ones (Including soil/more bioclimactic variables? out of the backburner!)
 
-apply new bio vars because these ones might actually be cooked....
+NN!!!!
+
+develop into a usable tool? where you dont have to understand the entire codebase in order to use it
+
+also have crazy instructions on how to use it
 
 
 
 
 ### Backburner
 Possibly generate pseudo absence points using environmentally stratified methods   
-  
-Including soil/more bioclimactic variables?  
+   
 Figure out what the continuous boyce index is and how that might be helpful 
+
+spatial blocking cross validation, possibly through verde scikit - this may reduce sampling bias
 
 ### Notes/Discussion
 1. We have chosen pests that have caused more than 1 million bushels lost in 2022, 2023, and 2024. Some of these listed pests from [Crop Protection Network](https://cropprotectionnetwork.org/) are more general clades; we distinguished between them as much as possible and isolated the most detrimental species in these groups
@@ -78,4 +83,4 @@ The goal is to predict the new expanded range of overwintering sites for common 
 This repository features the codebase and a very sparse amount of data. The data will be made available soon, it is currently absent for pushing/pulling efficiency. 
 
 
-Updated July 16, 2026
+Updated July 24, 2026
