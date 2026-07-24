@@ -42,6 +42,13 @@ spatial blocking cross validation, possibly through verde scikit - this may redu
 
 Investigating field studies of NST efficacy in areas with known infestations  
 
+clean up the month range of each pest based on crop
+
+check pearsons correlation coeeff
+
+apply new bio vars because these ones might actually be cooked....
+
+
 
 
 ### Backburner
