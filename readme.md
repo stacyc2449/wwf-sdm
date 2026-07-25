@@ -35,6 +35,8 @@ check pearsons correlation coeeff
 
 Investigating field studies of NST efficacy in areas with known infestations (sorta done? will end up being done in discussion)
 
+check feature weight (i only did for tree and linear models)
+
 ### To Do:
 I really don't like modifying the R script to include nonexistent uncertainty.... but that is the only way seedcorn maggot sightings will work...
 
@@ -51,9 +53,6 @@ NN!!!!
 develop into a usable tool? where you dont have to understand the entire codebase in order to use it
 
 also have crazy instructions on how to use it
-
-
-
 
 ### Backburner
 Possibly generate pseudo absence points using environmentally stratified methods   
