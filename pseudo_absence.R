@@ -99,7 +99,7 @@ allowed_area <- st_transform(allowed_area, crs = 4326)
 
 # ncr is only lat/lon readings
 
-file_list <- list.files(path = "chelsa_clim", pattern = "\\.tif$", full.names = TRUE)
+file_list <- list.files(path = "inputs\\chelsa_clim", pattern = "\\.tif$", full.names = TRUE)
 multilayer_raster <- rast(file_list)
 
 # bioclim.data <- rast("chelsa_clim\\CHELSA_bio02_1981-2010_V.2.1.tif")
@@ -132,9 +132,9 @@ dataMap.ncr_mid  <- SpatialPointsDataFrame(train_mid[,c(2,3)], class.pa_mid,
                                       proj4string =crs)
 
                                       # write as shp
-dir.create(paste0("data/", name))
+dir.create(paste0("outputs/data/", name))
 sf_map.ncr_mid <- st_as_sf(dataMap.ncr_mid, c("lon", "lat"), crs = 4326)
-st_write(sf_map.ncr_mid, paste0('data/', name, '/mid.shp'), paste0(name, '_mid'), driver='ESRI Shapefile', append = FALSE)
+st_write(sf_map.ncr_mid, paste0('outputs/data/', name, '/mid.shp'), paste0(name, '_mid'), driver='ESRI Shapefile', append = FALSE)
 
 class.pa_high <- data.frame(train_high[,1])
 colnames(class.pa_high) <- 'CLASS'
@@ -143,12 +143,12 @@ dataMap.ncr_high  <- SpatialPointsDataFrame(train_high[,c(2,3)], class.pa_high,
 
                                       # write as shp
 sf_map.ncr_high <- st_as_sf(dataMap.ncr_high, c("lon", "lat"), crs = 4326)
-st_write(sf_map.ncr_high, paste0('data/', name, '/high.shp'), paste0(name, '_high'), driver='ESRI Shapefile', append = FALSE)
+st_write(sf_map.ncr_high, paste0('outputs/data/', name, '/high.shp'), paste0(name, '_high'), driver='ESRI Shapefile', append = FALSE)
 
 
 
 # ALL THE LOW THINGS, SINCE THIS MUST BE LOOPED 10 TIMES
-dir.create(paste0("data/", name, "/low"))
+dir.create(paste0("outputs/data/", name, "/low"))
 for (i in 1:10){
     bg_low <- st_sample(allowed_area, size = 100)
     bg_low <- st_transform(bg_low, crs = 4326)
@@ -167,12 +167,5 @@ for (i in 1:10){
 
                                         # write as shp
     sf_map.ncr_low <- st_as_sf(dataMap.ncr_low, c("lon", "lat"), crs = 4326)
-    st_write(sf_map.ncr_low, paste0('data/', name, "/low/", i, '.shp'), paste0(name, '_low'), driver='ESRI Shapefile', append = FALSE)
+    st_write(sf_map.ncr_low, paste0('outputs/data/', name, "/low/", i, '.shp'), paste0(name, '_low'), driver='ESRI Shapefile', append = FALSE)
 }
-
-
-
-# # plot our points
-# plot(ras_ras, main='NCR Presence and Absence')
-# points(bg_mid, col='red', pch = 16, cex = .3)
-# points(ncr, col='black', pch = 16, cex = .3)

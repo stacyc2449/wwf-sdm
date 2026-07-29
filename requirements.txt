@@ -4,4 +4,15 @@ elapid
 geopandas
 python-heapq
 xgboost
+scikit-learn
+pygam
+rasterio
+numpy
+pandas
+matplotlib
+xarray
+regionmask
 
+# for cnn alg:
+# torch
+# torchgeo

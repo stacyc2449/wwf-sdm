@@ -37,16 +37,16 @@ Investigating field studies of NST efficacy in areas with known infestations (so
 
 check feature weight (i only did for tree and linear models)
 
-### To Do:
-I really don't like modifying the R script to include nonexistent uncertainty.... but that is the only way seedcorn maggot sightings will work...
-
-Solution: run all of them, with seedcorn maggots being the only exception
-
 Make gif setup of the spreading range over the course of the next few decades 
 
 clean up the month range of each pest based on crop
 
 current bio vars are not that cooked, but try the new ones (Including soil/more bioclimactic variables? out of the backburner!)
+
+### To Do:
+I really don't like modifying the R script to include nonexistent uncertainty.... but that is the only way seedcorn maggot sightings will work...
+
+Solution: run all of them, with seedcorn maggots being the only exception
 
 NN!!!!
 

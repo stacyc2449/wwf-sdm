@@ -1,23 +1,14 @@
 # # SDM in Python
-# 
-# Some features based on https://github.com/daniel-furman/eco-distribution-mapping/blob/main/Python-sdm.ipynb
 
 # ### Generate Pseudo-Absence Data
 # Absence data must be generated for these classifiers, and different quantities must be generated for types of classifiers, based on Barbet-Massin et al., 2012.
 
-# ### Making subdirectories
-# inputs - files input for processing   
-# outputs - results from processing
-
 import os
-# os.mkdir("inputs", ex)
-# os.mkdir("outputs")
 import subprocess
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import SplineTransformer
 from sklearn.pipeline import make_pipeline
-from sklearn.linear_model import LinearRegression
-# from sklearn.ensemble import ExtraTreesClassifier 
+from sklearn.linear_model import LinearRegression 
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from pygam import LogisticGAM, s, f
 from sklearn.tree import DecisionTreeClassifier
@@ -61,23 +52,23 @@ import xarray as xr
 import regionmask
 
 
-files_list = ["nst_pest_sightings\\bean_leaf_beetle_0003221-260623161305970\\0003221-260623161305970.csv", 
-              "nst_pest_sightings\\bird_cherry_aphid_0003207-260623161305970\\0003207-260623161305970.csv",
-              "nst_pest_sightings\\black_cutworm_0003212-260623161305970\\0003212-260623161305970.csv",
+files_list = ["inputs\\nst_pest_sightings\\bean_leaf_beetle_0003221-260623161305970\\0003221-260623161305970.csv", 
+              "inputs\\nst_pest_sightings\\bird_cherry_aphid_0003207-260623161305970\\0003207-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\black_cutworm_0003212-260623161305970\\0003212-260623161305970.csv",
             #   "nst_pest_sightings\\corn_leaf_aphid_0003215-260623161305970\\0003215-260623161305970.csv",
-              "nst_pest_sightings\\differential_grasshopper0032387-260623161305970\\0032387-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\differential_grasshopper0032387-260623161305970\\0032387-260623161305970.csv",
             #   "nst_pest_sightings\\european_corn_borer0003385-260623161305970\\0003385-260623161305970.csv",
-              "nst_pest_sightings\\green_stink_0005409-260623161305970\\0005409-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\green_stink_0005409-260623161305970\\0005409-260623161305970.csv",
             #   "nst_pest_sightings\\hessian_fly_0003394-260623161305970\\0003394-260623161305970.csv",
-              "nst_pest_sightings\\japanese_beetle_0003383-260623161305970\\0003383-260623161305970.csv",
-              "nst_pest_sightings\\northern_corn_rootworm_0003360-260623161305970\\0003360-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\japanese_beetle_0003383-260623161305970\\0003383-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\northern_corn_rootworm_0003360-260623161305970\\0003360-260623161305970.csv",
             #   "nst_pest_sightings\\reg_legged_grasshopperobservations-752840.csv\\observations-752840.csv",
-              "nst_pest_sightings\\seedcorn_maggot_0003200-260623161305970\\0003200-260623161305970.csv",
-              "nst_pest_sightings\\southern_green_stink_0003348-260623161305970\\0003348-260623161305970.csv",
-              "nst_pest_sightings\\three_cornered_alfalfa_0003390-260623161305970\\0003390-260623161305970.csv",
-              "nst_pest_sightings\\true_armyworm0032387-260623161305970\\0032387-260623161305970.csv",
-              "nst_pest_sightings\\two_striped_grasshopper0032397-260623161305970\\0032397-260623161305970.csv",
-              "nst_pest_sightings\\western_corn_rootworm_0003372-260623161305970\\0003372-260623161305970.csv"
+              "inputs\\nst_pest_sightings\\seedcorn_maggot_0003200-260623161305970\\0003200-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\southern_green_stink_0003348-260623161305970\\0003348-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\three_cornered_alfalfa_0003390-260623161305970\\0003390-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\true_armyworm0032387-260623161305970\\0032387-260623161305970.csv",
+              "input\\nst_pest_sightings\\two_striped_grasshopper0032397-260623161305970\\0032397-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\western_corn_rootworm_0003372-260623161305970\\0003372-260623161305970.csv"
               ]
 
 # Run the subprocess, R code to generate pseudo absences. Will be customized depending on the models
@@ -92,6 +83,9 @@ def make_model_dict(name, model, model_class):
         "class": model_class
     }
 
+####
+#### MAKE SURE TO CHANGE FOR CUSTOM R FILE PATH
+####
 def make_cmd(path, name):
     return ["C:\\Program Files\\R\\R-4.4.1\\bin\\Rscript.exe",'pseudo_absence.R', 
            path, name]
@@ -144,21 +138,15 @@ command_wcr = make_cmd(files_list[12], "westcornrootworm")
 
 command_list = [command_blb, command_bca, command_bc, command_dg, command_gs, command_jb, command_ncr, command_sm, command_sgs, command_tca, command_ta, command_tsg, command_wcr]
 
-#   already done 
-
-# loading current ras feats
-# ras_feats = sorted(glob.glob(
-#     'worldclim/wc2.1_2.5m_bio_*.tif'))
-
 # THE ORDER IS SIGNIFICANT!!!!
-ras_feats = ["chelsa_clim/CHELSA_bio02_1981-2010_V.2.1.tif", 
-             "chelsa_clim/CHELSA_bio04_1981-2010_V.2.1.tif", 
-             "chelsa_clim/CHELSA_bio06_1981-2010_V.2.1.tif",
-             "chelsa_clim/CHELSA_bio14_1981-2010_V.2.1.tif",
-             "chelsa_clim/CHELSA_bio15_1981-2010_V.2.1.tif",
-             "chelsa_clim/CHELSA_bio19_1981-2010_V.2.1.tif",
-             "chelsa_clim/CHELSA_fgd_1981-2010_V.2.1.tif",
-             "chelsa_clim/CHELSA_scd_1981-2010_V.2.1.tif"]
+ras_feats = ["inputs/chelsa_clim/CHELSA_bio02_1981-2010_V.2.1.tif", 
+             "inputs/chelsa_clim/CHELSA_bio04_1981-2010_V.2.1.tif", 
+             "inputs/chelsa_clim/CHELSA_bio06_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_bio14_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_bio15_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_bio19_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_fgd_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_scd_1981-2010_V.2.1.tif"]
 
 print('There are ', len(ras_feats), ' raster features.')
 print(ras_feats)
@@ -184,15 +172,13 @@ max_lat = 83.5
 
 downscale_factor = 0.25
 
-out_dir = "chelsa_clim\\trim"
+out_dir = "inputs\\chelsa_clim\\trim"
 
 # Example: the split files are assumed to be named like:
 # worldclim\future40\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp126_bio19_2041-2060.tif
 # BUT YOU MUST CHANGE THIS to match your real filenames.
 def layer_path(period_dir, model_ssp, feature_name, period_suffix):
-    # ---- EDIT THIS STRING PATTERN TO MATCH YOUR DATA ----
-    return rf"chelsa_clim\future\{model_ssp}\CHELSA_mpi-esm1-2-hr_ssp{model_ssp}_{feature_name}_{period_dir}_V.2.1.tif"
-    # ------------------------------------------------------
+    return rf"inputs\chelsa_clim\future\{model_ssp}\CHELSA_mpi-esm1-2-hr_ssp{model_ssp}_{feature_name}_{period_dir}_V.2.1.tif"
 
 # chelsa_clim\future\126\CHELSA_mpi-esm1-2-hr_ssp126_bio02_2041-2070_V.2.1.tif
 # chelsa_clim\future\126\CHELSA_mpi-esm1-2-hr_ssp126_bio02_2041-2070_V.2.1.tif
@@ -221,9 +207,9 @@ for i, ssp in enumerate(ssps_40):
         
         with rasterio.open(in_path) as src:
             window = from_bounds(
-                                        min_lon, min_lat, max_lon, max_lat,
-                                        transform=src.transform
-                                    ).round_offsets().round_lengths()
+                            min_lon, min_lat, max_lon, max_lat,
+                            transform=src.transform
+                        ).round_offsets().round_lengths()
             
             new_height = int(window.height * downscale_factor)
             new_width = int(window.width * downscale_factor)
@@ -266,83 +252,7 @@ window_lats = np.linspace(max_lat, min_lat, num = 1785)
 land_polygons = regionmask.defined_regions.natural_earth_v5_0_0.land_110
 pred_mask = land_polygons.mask(window_lons, window_lats).values
 
-land_mask = ~np.isnan(pred_mask)
-# future_stacks = ["worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp126_2021-2040.tif", "worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp245_2021-2040.tif",
-#                     "worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp370_2021-2040.tif", "worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp585_2021-2040.tif"]
-# future_40_stacks = ["worldclim\\future40\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp126_2041-2060.tif", "worldclim\\future40\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp245_2041-2060.tif", "worldclim\\future40\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp370_2041-2060.tif",
-#                     "worldclim\\future40\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp585_2041-2060.tif"]
-
-# out_dir = "future_split_bands"
-
-
-# training_feature_names = [
-#     "bio13",
-#     "bio14",
-#     "bio15",
-#     "bio2",
-#     "bio4",
-#     "bio5",
-#     "bio6"
-# ]
-
-# future_band_map = {
-#     "bio13": 13,
-#     "bio14": 14,
-#     "bio15": 15,
-#     "bio2": 2,
-#     "bio4": 4,
-#     "bio5": 5,
-#     "bio6": 6
-# }
-
-# min_lon = -170
-# max_lon = -52
-# min_lat = 24
-# max_lat = 83.5
-
-# future_ras_feats = []
-
-# for index, stack in enumerate(future_40_stacks):
-#     # os.mkdir(f"{out_dir}_{index}")
-#     with rasterio.open(stack) as src:
-#         window = from_bounds(
-#                 min_lon,
-#                 min_lat,
-#                 max_lon,
-#                 max_lat,
-#                 transform=src.transform
-#         ).round_offsets().round_lengths()
-
-#         data = src.read(1, window=window)
-
-#         new_transform = src.window_transform(window)
-
-#         profile = src.profile.copy()
-#         profile.update({
-#             "height": data.shape[0],
-#             "width": data.shape[1],
-#             "transform": new_transform,
-#             "count": 1
-#         })
-        
-#         temp_future_ras_feats = []
-#         for feature_name in training_feature_names:
-            
-#             band_index = future_band_map[feature_name]
-
-#             band = src.read(band_index, window=window)
-
-#             out_path = os.path.join(f"{out_dir}_{index}", f"future_{feature_name}.tif")
-#             with rasterio.open(out_path, "w", **profile) as dst:
-#                 dst.write(band, 1)
-#                 dst.set_band_description(1, feature_name)
-
-#             temp_future_ras_feats.append(out_path)
-
-#     future_ras_feats.append(temp_future_ras_feats)
-#     # future_ras_feats = sorted(glob.glob(
-#     #     'future_split_bands_1/future_bio*.tif')) 
-
+land_mask = ~np.isnan(pred_mask) 
 
 print("future ras feats loaded.")
 
@@ -361,7 +271,7 @@ for command in command_list:
     # for f in sorted(glob.glob('data/ncr*')):
     #     shutil.copy(f, 'inputs/')
 
-    ncr_gdf_mid = gpd.GeoDataFrame.from_file('data/' + command[3] + '/mid.shp')
+    ncr_gdf_mid = gpd.GeoDataFrame.from_file('outputs/data/' + command[3] + '/mid.shp')
     # ncr_gdf_high = gpd.GeoDataFrame.from_file('data/' + command[3] + '/high.shp')
 
     # Checking duplicates and NA values. Coordinate reference system should ideally be epsg: 4326

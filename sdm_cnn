@@ -1,0 +1,13 @@
+from torchgeo.datasets import RasterDataset
+
+# set up the raster dataset class
+class GeoTiffDataset(RasterDataset):
+    filename_glob = "*.tif"
+
+# initialize the raster dataset
+raster_data = GeoTiffDataset(
+    Paths = [
+        "outputs\\data\\beanleafbeetle"
+    ]
+)
+
