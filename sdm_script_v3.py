@@ -78,6 +78,20 @@ files_list = ["nst_pest_sightings\\bean_leaf_beetle_0003221-260623161305970\\000
               ]
 
 # Run the subprocess, R code to generate pseudo absences. Will be customized depending on the models
+def make_model_dict(name, model):
+    return {
+        "name": name,
+        "model": model,
+        "threshold": -1,
+        "auc": -1,
+        "maxsss": -1,
+        "frozen model": None
+    }
+
+def make_cmd(path, name):
+    return ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
+           path, name]
+
 def plotit(x, title, colors, cmap="Blues"):
     x = np.asarray(x)
     unique_vals = [0, 1, -9999]
@@ -110,53 +124,39 @@ def plotit(x, title, colors, cmap="Blues"):
     plt.show()
 
 
-command_blb = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[0], "beanleafbeetle"]
-
-command_bca = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[1], "birdcherryaphid"]
-
-command_bc = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[2], "blackcutworm"]
-
-command_dg = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[3], "differentialgrasshopper"]
-
-command_gs = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[4], "greenStink"]
-
-command_jb = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[5], "japanesebeetle"]
-
-command_ncr = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[6], "northerncornrootworm"]
-
-command_sm = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[7], "seedcornmaggot"]
-
-command_sgs = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[8], "southerngreenstink"]
-
-command_tca = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[9], "threecornerneredalfalfa"]
-
-command_ta = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[10], "truearmyworm"]
-
-command_tsg = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[11], "two-striped-grasshopper"]
-
-command_wcr = ["C:\\Users\\chenst-intern\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\x64\\Rscript.exe",'pseudo_absence.R', 
-           files_list[12], "westcornrootworm"]
+command_blb = make_cmd(files_list[0], "beanleafbeetle")
+command_bca = make_cmd(files_list[1], "bircherryaphid")
+command_bc = make_cmd(files_list[2], "blackcutworm")
+command_dg = make_cmd(files_list[3], "differentialgrasshopper") 
+command_gs = make_cmd(files_list[4], "greenStink")
+command_jb = make_cmd(files_list[5], "japanesebeetle")
+command_ncr = make_cmd(files_list[6], "northerncornrootworm")
+command_sm = make_cmd(files_list[7], "seedcornmaggot")
+command_sgs = make_cmd(files_list[8], "southerngreenstink")
+command_tca = make_cmd(files_list[9], "threecornerneredalfalfa")
+command_ta = make_cmd(files_list[10], "truearmyworm")
+command_tsg = make_cmd(files_list[11], "two-striped-grasshopper")
+command_wcr = make_cmd(files_list[12], "westcornrootworm")
 
 command_list = [command_blb, command_bca, command_bc, command_dg, command_gs, command_jb, command_ncr, command_sm, command_sgs, command_tca, command_ta, command_tsg, command_wcr]
 
 #   already done 
+
+# loading current ras feats
+ras_feats = sorted(glob.glob(
+    'worldclim/wc2.1_2.5m_bio_*.tif'))
+
+# THE ORDER IS SIGNIFICANT!!!!
+
+print('There are ', len(ras_feats), ' raster features.')
+print(ras_feats)
+
 # loading future prediction
 future_stacks = ["worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp126_2021-2040.tif", "worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp245_2021-2040.tif",
                     "worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp370_2021-2040.tif", "worldclim\\future\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp585_2021-2040.tif"]
 future_40_stacks = ["worldclim\\future40\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp126_2041-2060.tif", "worldclim\\future40\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp245_2041-2060.tif", "worldclim\\future40\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp370_2041-2060.tif",
                     "worldclim\\future40\\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp585_2041-2060.tif"]
+
 out_dir = "future_split_bands"
 
 
@@ -190,13 +190,6 @@ future_ras_feats = []
 for index, stack in enumerate(future_40_stacks):
     # os.mkdir(f"{out_dir}_{index}")
     with rasterio.open(stack) as src:
-        # print("Band count:", src.count)
-        # print("CRS:", src.crs)
-        # print("Shape:", src.shape)
-        # print("Bounds:", src.bounds)
-        # print("Descriptions:", src.descriptions)
-        # print("Indexes:", src.indexes)
-# with rasterio.open(future_stack) as src:
         window = from_bounds(
                 min_lon,
                 min_lat,
@@ -269,25 +262,13 @@ for command in command_list:
     # print("{} observations with {} columns".format(*ncr_gdf_high.shape))
     # Mapping the species presences (pa == 1)
 
-    ncr_gdf_mid[ncr_gdf_mid.CLASS == 1].plot(marker='*', color='green', markersize=5)
-
-    # Mapping the species absences (pa == 0)
-
-    ncr_gdf_mid[ncr_gdf_mid.CLASS == 0].plot(marker='*', color='red', markersize=5)
-
     # ### Classifier Training
 
     # TO MOVE FILES INTO INPUT
     # for f in sorted(glob.glob('worldclim/wc2.1_2.5m_bio_*.tif')):
     #     shutil.copy(f,'inputs/')
 
-    ras_feats = sorted(glob.glob(
-        'worldclim/wc2.1_2.5m_bio_*.tif'))
-
-    # THE ORDER IS SIGNIFICANT!!!!
-
-    print('There are ', len(ras_feats), ' raster features.')
-    print(ras_feats)
+    
     # current order: 13, 14, 15, 2, 4, 5, 6
 
     
@@ -364,16 +345,6 @@ for command in command_list:
     k = 10
     kf = model_selection.KFold(n_splits=k, shuffle=True, random_state=42)
 
-    def make_model_dict(name, model):
-        return {
-            "name": name,
-            "model": model,
-            "threshold": -1,
-            "auc": -1,
-            "maxsss": -1,
-            "frozen model": None
-        }
-
     rf = make_model_dict("random forest", RandomForestClassifier(
         n_estimators=500,
         max_depth=10,
@@ -383,22 +354,14 @@ for command in command_list:
         n_jobs=-1))
 
     lda = make_model_dict("lda", LinearDiscriminantAnalysis())
-
     dtc = make_model_dict("decision tree", DecisionTreeClassifier(max_depth=3, min_samples_split=5, random_state=42))
-
     lr = make_model_dict("log res glm", LogisticRegression(max_iter = 1000))
-
     lr1 = make_model_dict("log res big", LogisticRegression(max_iter=5000))
-
     xgb = make_model_dict("xg boost", XGBClassifier())
-
     mars_model = make_pipeline(SplineTransformer(degree=1, n_knots=10, include_bias=False), LogisticRegression())
     mars = make_model_dict("mars", mars_model)
-
     me = make_model_dict("maxent", MaxentModel())
-
     gam = make_model_dict("log gam", LogisticGAM(s(0) + s(1) + s(2), lam=10))
-
     models = [rf, lda, dtc, lr, lr1, xgb, mars, me, gam]
 
     
@@ -496,12 +459,6 @@ for command in command_list:
 
     # Loading future predictions
 
-
-
-    
-
-    
-    
     # we use votingclassifier, but since we already have pretrained models, we use frozen classifiers as detailed here:
     # https://github.com/scikit-learn/scikit-learn/issues/12297
     
