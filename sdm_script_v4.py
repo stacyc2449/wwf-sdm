@@ -50,7 +50,15 @@ from sklearn.ensemble import VotingClassifier
 from rasterio.enums import Resampling
 import xarray as xr
 import regionmask
+import logging
 
+# logging
+logging.basicConfig(
+    filename='logs.log',
+    filemode='w',               # 'a' to append logs, 'w' to overwrite every run
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO          # Capture INFO, WARNING, ERROR, and CRITICAL logs
+)
 
 files_list = ["inputs\\nst_pest_sightings\\bean_leaf_beetle_0003221-260623161305970\\0003221-260623161305970.csv", 
               "inputs\\nst_pest_sightings\\bird_cherry_aphid_0003207-260623161305970\\0003207-260623161305970.csv",
@@ -149,21 +157,11 @@ ras_feats = ["inputs/chelsa_clim/current/CHELSA_bio02_1981-2010_V.2.1.tif",
              "inputs/chelsa_clim/current/CHELSA_scd_1981-2010_V.2.1.tif"]
 
 print('There are ', len(ras_feats), ' raster features.')
-print(ras_feats)
+logging.info("Current raster features loaded: ".join(ras_feats))
 
 # loading future prediction
 
 training_feature_names = ["bio02", "bio04", "bio06", "bio14", "bio15", "bio19", "fgd", "scd"]
-
-# bio band id within the original multiband product
-feature_id = {
-    "bio19": 19,
-    "bio14": 14,
-    "bio15": 15,
-    "bio2": 2,
-    "bio4": 4,
-    "bio6": 6
-}
 
 min_lon = -170
 max_lon = -52
@@ -242,14 +240,17 @@ pred_mask = land_polygons.mask(window_lons, window_lats).values
 land_mask = ~np.isnan(pred_mask) 
 
 print("future ras feats loaded.")
+logging.info("Future raster features loaded.")
 
 for command in command_list:
+    logging.info(command[3])
     try:
         subprocess.run(command, capture_output=True, 
             text=True, check = True)
     except subprocess.CalledProcessError as e:
         print(f"R Script failed with exit code {e.returncode}")
         print("Error Message:\n", e.stderr)
+        logging.warning("R script failed. Proceeding if data files exist.")
 
     # ### Converting shapefiles (.shp) to geopandas dataframe
 
@@ -257,13 +258,10 @@ for command in command_list:
     # ncr_gdf_high = gpd.GeoDataFrame.from_file('data/' + command[3] + '/high.shp')
 
     # Checking duplicates and NA values. Coordinate reference system should ideally be epsg: 4326
-
-    print("Number of duplicates: ", ncr_gdf_mid.duplicated(subset='geometry', keep='first').sum())
-    print("Number of NA's: ", ncr_gdf_mid['geometry'].isna().sum())
     print("Coordinate reference system: {}".format(ncr_gdf_mid.crs))
     print("{} observations with {} columns".format(*ncr_gdf_mid.shape))
 
-    
+    logging.info("{} observations with {} columns".format(*ncr_gdf_mid.shape))
 
     with rasterio.open(ras_feats[0]) as src:
         raster_crs = src.crs
@@ -347,11 +345,14 @@ for command in command_list:
         thresholds = []
         msss_scores = []
         print(model["name"])
+        logging.info("Model: " + model["name"])
         try:
             cv_score = model_selection.cross_val_score(model["model"], train_x_models, train_y_models, cv=skf)
             print("Cross validation score:", np.mean(cv_score))
+            logging.info(model["name"] + " CV score: " + str(np.mean(cv_score)))
         except AttributeError as e:
             print("cross validation score not available for this model.")
+            logging.warning(model["name"] + ": CV Score not available")
 
         for train_id, val_id in skf.split(train_x_models, train_y_models):
             x_train = train_x_models[train_id]
@@ -394,10 +395,11 @@ for command in command_list:
         model["maxsss"] = np.mean(msss_scores)
         
         print("Best threshold:", model["threshold"])
+        logging.info("Best threshold: " + str(model["threshold"]))
+
         print("Max sensitivity + specificity:", model["maxsss"])
-        # print("Sensitivity:", best_sensitivity)
-        # print("Specificity:", best_specificity)
         print("tss: ", model["maxsss"] - 1)
+        logging.info("TSS: " + str(model["maxsss"] - 1))
     # retrain the model with all training data available
         model["model"].fit(train_x_models, train_y_models)
         model["frozen model"] = FrozenEstimator(model["model"])
@@ -414,6 +416,7 @@ for command in command_list:
         auc_score = roc_auc_score(test_y_mid, test_pred)
         model["auc"] = auc_score
         print("AUC score: ", auc_score)
+        logging.info("AUC score: " + str(auc_score))
 
         # try:
         #     results = permutation_importance(model["model"], test_x_mid, test_y_mid, scoring='roc_auc')
@@ -446,6 +449,7 @@ for command in command_list:
 
     largest_auc = heapq.nlargest(3, range(len(auc_scores)), key=auc_scores.__getitem__)
     print(largest_auc)
+    logging.info(largest_auc)
 
     # Loading future predictions
 
@@ -489,6 +493,10 @@ for command in command_list:
     ensemble_score = roc_auc_score(test_y_mid, ensemble_test_pred)
     print("Ensemble model score: ", ensemble_score)
     print("ensemble threshold: ", best_threshold, " ", best_sum)
+
+    logging.info("Voting model ROC AUC: " + str(ensemble_score))
+    logging.info("Voting model threshold: " + str(best_threshold))
+    logging.info("Best sum: " + str(best_sum))
 
 
     for index, feat in enumerate(future_ras_feats):

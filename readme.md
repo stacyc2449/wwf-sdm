@@ -27,7 +27,7 @@ Ensemble modelling - how do you choose 3 models?
 
 Display data better 
 
-WE MUST MITIGATE SAMPLING BIAS
+Sampling bias?
 
 myabe also thin the presence sightings within ~~10km~~ 5 km of each other?
 
@@ -43,21 +43,19 @@ clean up the month range of each pest based on crop
 
 current bio vars are not that cooked, but try the new ones (Including soil/more bioclimactic variables? out of the backburner!)
 
-### To Do:
 I really don't like modifying the R script to include nonexistent uncertainty.... but that is the only way seedcorn maggot sightings will work...
 
 Solution: run all of them, with seedcorn maggots being the only exception
 
-NN!!!!
+### To Do:
 
 develop into a usable tool? where you dont have to understand the entire codebase in order to use it
 
-also have crazy instructions on how to use it
 
 ### Backburner
 Possibly generate pseudo absence points using environmentally stratified methods   
    
-Figure out what the continuous boyce index is and how that might be helpful 
+continuous boyce index and how that might be helpful 
 
 spatial blocking cross validation, possibly through verde scikit - this may reduce sampling bias
 
