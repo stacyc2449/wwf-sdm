@@ -139,14 +139,14 @@ command_wcr = make_cmd(files_list[12], "westcornrootworm")
 command_list = [command_blb, command_bca, command_bc, command_dg, command_gs, command_jb, command_ncr, command_sm, command_sgs, command_tca, command_ta, command_tsg, command_wcr]
 
 # THE ORDER IS SIGNIFICANT!!!!
-ras_feats = ["inputs/chelsa_clim/CHELSA_bio02_1981-2010_V.2.1.tif", 
-             "inputs/chelsa_clim/CHELSA_bio04_1981-2010_V.2.1.tif", 
-             "inputs/chelsa_clim/CHELSA_bio06_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/CHELSA_bio14_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/CHELSA_bio15_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/CHELSA_bio19_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/CHELSA_fgd_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/CHELSA_scd_1981-2010_V.2.1.tif"]
+ras_feats = ["inputs/chelsa_clim/current/CHELSA_bio02_1981-2010_V.2.1.tif", 
+             "inputs/chelsa_clim/current/CHELSA_bio04_1981-2010_V.2.1.tif", 
+             "inputs/chelsa_clim/current/CHELSA_bio06_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/current/CHELSA_bio14_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/current/CHELSA_bio15_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/current/CHELSA_bio19_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/current/CHELSA_fgd_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/current/CHELSA_scd_1981-2010_V.2.1.tif"]
 
 print('There are ', len(ras_feats), ' raster features.')
 print(ras_feats)
@@ -174,17 +174,11 @@ downscale_factor = 0.25
 
 out_dir = "inputs\\chelsa_clim\\trim"
 
-# Example: the split files are assumed to be named like:
-# worldclim\future40\wc2.1_2.5m_bioc_GISS-E2-1-G_ssp126_bio19_2041-2060.tif
-# BUT YOU MUST CHANGE THIS to match your real filenames.
 def layer_path(period_dir, model_ssp, feature_name, period_suffix):
     return rf"inputs\chelsa_clim\future\{model_ssp}\CHELSA_mpi-esm1-2-hr_ssp{model_ssp}_{feature_name}_{period_dir}_V.2.1.tif"
 
-# chelsa_clim\future\126\CHELSA_mpi-esm1-2-hr_ssp126_bio02_2041-2070_V.2.1.tif
-# chelsa_clim\future\126\CHELSA_mpi-esm1-2-hr_ssp126_bio02_2041-2070_V.2.1.tif
 future_ras_feats = []
 
-# Which scenarios you have (correspond to your former stacks)
 ssps_40 = ["126", "370", "585"]
 period_dir = "2041-2070"
 period_suffix = "2041-2070"
@@ -192,15 +186,8 @@ period_suffix = "2041-2070"
 for i, ssp in enumerate(ssps_40):
     out_subdir = f"{out_dir}_{ssp}"
     os.makedirs(out_subdir, exist_ok=True)
-
-    # # --- 1) Open a reference feature to compute the window/profile ---
-    # ref_feature = "bio02"
-    # ref_path = layer_path(period_dir, ssp, ref_feature, period_suffix)
-
-    # with rasterio.open(ref_path) as ref:
         
     temp_future_ras_feats = []
-    # --- 2) Clip/write each requested feature tif ---
     for feature_name in training_feature_names:
         in_path = layer_path(period_dir, ssp, feature_name, period_suffix)
 
@@ -266,11 +253,6 @@ for command in command_list:
 
     # ### Converting shapefiles (.shp) to geopandas dataframe
 
-    
-
-    # for f in sorted(glob.glob('data/ncr*')):
-    #     shutil.copy(f, 'inputs/')
-
     ncr_gdf_mid = gpd.GeoDataFrame.from_file('outputs/data/' + command[3] + '/mid.shp')
     # ncr_gdf_high = gpd.GeoDataFrame.from_file('data/' + command[3] + '/high.shp')
 
@@ -281,32 +263,12 @@ for command in command_list:
     print("Coordinate reference system: {}".format(ncr_gdf_mid.crs))
     print("{} observations with {} columns".format(*ncr_gdf_mid.shape))
 
-    # print("Number of duplicates: ", ncr_gdf_high.duplicated(subset='geometry', keep='first').sum())
-    # print("Number of NA's: ", ncr_gdf_high['geometry'].isna().sum())
-    # print("Coordinate reference system: {}".format(ncr_gdf_high.crs))
-    # print("{} observations with {} columns".format(*ncr_gdf_high.shape))
-    # Mapping the species presences (pa == 1)
-
-    # ### Classifier Training
-
-    # TO MOVE FILES INTO INPUT
-    # for f in sorted(glob.glob('worldclim/wc2.1_2.5m_bio_*.tif')):
-    #     shutil.copy(f,'inputs/')
-
-    
-    # current order: 13, 14, 15, 2, 4, 5, 6
-
     
 
     with rasterio.open(ras_feats[0]) as src:
         raster_crs = src.crs
 
     ncr_gdf_mid = ncr_gdf_mid.to_crs(raster_crs)
-    # ncr_gdf_high = ncr_gdf_high.to_crs(raster_crs)
-
-    ncr_gdf_low = []
-    for i in range(1,11):
-        ncr_gdf_low.append(gpd.GeoDataFrame.from_file('data/' + command[3] + '/low/'+ str(i) + '.shp').to_crs(raster_crs))
 
     
     print(ncr_gdf_mid.crs)
@@ -345,29 +307,6 @@ for command in command_list:
     train_x_mid.shape, test_x_mid.shape, train_y_mid.shape, test_y_mid.shape
 
     print(train_x_mid)
-
-    # train_xs_high, train_ys_high = load_training_vector(ncr_gdf_high, ras_feats, response_field='CLASS')
-
-    # x_df_high = pd.DataFrame(train_xs_high)
-    # x_df_high = x_df_high.apply(pd.to_numeric, errors="coerce")
-    # x_df_high = x_df_high.replace([np.inf, -np.inf], np.nan)
-
-    # y_ser_high = pd.Series(train_ys_high)
-
-    # mask_high = x_df_high.notna().all(axis=1) & y_ser_high.notna()
-
-    # # Apply mask_mid to both X and y
-    # train_xs_high_clean = x_df_high.loc[mask_high].to_numpy(dtype=float)
-    # train_ys_high_clean = y_ser_high.loc[mask_high].to_numpy()
-
-    # print("Original samples:", len(train_xs_high))
-    # print("Clean samples:", len(train_xs_high_clean))
-    # print("Dropped samples:", len(train_xs_high) - len(train_xs_high_clean))
-
-
-    # train_x_high, test_x_high, train_y_high, test_y_high = model_selection.train_test_split(train_xs_high_clean, train_ys_high_clean, test_size=0.25, random_state=42, stratify=train_ys_high_clean)
-    # train_xs_mid.shape, train_ys_mid.shape
-    # train_x_high.shape, test_x_high.shape, train_y_high.shape, test_y_high.shape
 
     # Classifier implementation
 

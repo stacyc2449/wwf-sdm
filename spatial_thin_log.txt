@@ -1,0 +1,19 @@
+********************************************** 
+ Beginning Spatial Thinning.
+ Script Started at: Mon Aug  3 23:54:39 2026
+There appear to be more than one species name in this *.csv file.
+Only using species name: Cerotoma trifurcata
+
+Thinning Parameter Used (in km): 5
+Number of replicates of thinning script: 10
+
+Elapsed time for thinning completion
+0.05 0.03 0.09 NA NA
+
+Number of data.frames per locations retained
+loc.cnt df.freq
+482
+10
+Maximum number of records after thinning: 482
+Number of data.frames with max records: 10
+No files written for this run.

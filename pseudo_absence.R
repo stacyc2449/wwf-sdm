@@ -99,7 +99,7 @@ allowed_area <- st_transform(allowed_area, crs = 4326)
 
 # ncr is only lat/lon readings
 
-file_list <- list.files(path = "inputs\\chelsa_clim", pattern = "\\.tif$", full.names = TRUE)
+file_list <- list.files(path = "inputs\\chelsa_clim\\current", pattern = "\\.tif$", full.names = TRUE)
 multilayer_raster <- rast(file_list)
 
 # bioclim.data <- rast("chelsa_clim\\CHELSA_bio02_1981-2010_V.2.1.tif")
