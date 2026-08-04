@@ -55,7 +55,7 @@ import logging
 # logging
 logging.basicConfig(
     filename='logs.log',
-    filemode='w',               # 'a' to append logs, 'w' to overwrite every run
+    filemode='a',               # 'a' to append logs, 'w' to overwrite every run
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO          # Capture INFO, WARNING, ERROR, and CRITICAL logs
 )
