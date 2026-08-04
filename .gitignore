@@ -4,7 +4,9 @@
 chelsa_clim/
 worldclim/
 pests/
-outputs/
+outputs/*
+!outputs/correlations/
+!outputs/predictions/
 future_split_bands/
 nst_pest_sightings/
 data/

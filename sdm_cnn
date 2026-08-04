@@ -1,13 +1,64 @@
 from torchgeo.datasets import RasterDataset
 
-# set up the raster dataset class
-class GeoTiffDataset(RasterDataset):
-    filename_glob = "*.tif"
+import geopandas as gpd
+import rasterio
+from rasterio.features import rasterize
+import numpy as np
 
-# initialize the raster dataset
-raster_data = GeoTiffDataset(
-    Paths = [
-        "outputs\\data\\beanleafbeetle"
-    ]
-)
+def make_cmd(path, name):
+    return ["C:\\Program Files\\R\\R-4.4.1\\bin\\Rscript.exe",'pseudo_absence.R', 
+           path, name]
 
+files_list = ["inputs\\nst_pest_sightings\\bean_leaf_beetle_0003221-260623161305970\\0003221-260623161305970.csv", 
+              "inputs\\nst_pest_sightings\\bird_cherry_aphid_0003207-260623161305970\\0003207-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\black_cutworm_0003212-260623161305970\\0003212-260623161305970.csv",
+            #   "nst_pest_sightings\\corn_leaf_aphid_0003215-260623161305970\\0003215-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\differential_grasshopper0032387-260623161305970\\0032387-260623161305970.csv",
+            #   "nst_pest_sightings\\european_corn_borer0003385-260623161305970\\0003385-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\green_stink_0005409-260623161305970\\0005409-260623161305970.csv",
+            #   "nst_pest_sightings\\hessian_fly_0003394-260623161305970\\0003394-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\japanese_beetle_0003383-260623161305970\\0003383-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\northern_corn_rootworm_0003360-260623161305970\\0003360-260623161305970.csv",
+            #   "nst_pest_sightings\\reg_legged_grasshopperobservations-752840.csv\\observations-752840.csv",
+              "inputs\\nst_pest_sightings\\seedcorn_maggot_0003200-260623161305970\\0003200-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\southern_green_stink_0003348-260623161305970\\0003348-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\three_cornered_alfalfa_0003390-260623161305970\\0003390-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\true_armyworm0032387-260623161305970\\0032387-260623161305970.csv",
+              "input\\nst_pest_sightings\\two_striped_grasshopper0032397-260623161305970\\0032397-260623161305970.csv",
+              "inputs\\nst_pest_sightings\\western_corn_rootworm_0003372-260623161305970\\0003372-260623161305970.csv"
+              ]
+
+ras_feats = ["inputs/chelsa_clim/CHELSA_bio02_1981-2010_V.2.1.tif", 
+             "inputs/chelsa_clim/CHELSA_bio04_1981-2010_V.2.1.tif", 
+             "inputs/chelsa_clim/CHELSA_bio06_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_bio14_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_bio15_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_bio19_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_fgd_1981-2010_V.2.1.tif",
+             "inputs/chelsa_clim/CHELSA_scd_1981-2010_V.2.1.tif"]
+
+training_feature_names = ["bio02", "bio04", "bio06", "bio14", "bio15", "bio19", "fgd", "scd"]
+
+command_blb = make_cmd(files_list[0], "beanleafbeetle")
+command_bca = make_cmd(files_list[1], "bircherryaphid")
+command_bc = make_cmd(files_list[2], "blackcutworm")
+command_dg = make_cmd(files_list[3], "differentialgrasshopper") 
+command_gs = make_cmd(files_list[4], "greenStink")
+command_jb = make_cmd(files_list[5], "japanesebeetle")
+command_ncr = make_cmd(files_list[6], "northerncornrootworm")
+command_sm = make_cmd(files_list[7], "seedcornmaggot")
+command_sgs = make_cmd(files_list[8], "southerngreenstink")
+command_tca = make_cmd(files_list[9], "threecornerneredalfalfa")
+command_ta = make_cmd(files_list[10], "truearmyworm")
+command_tsg = make_cmd(files_list[11], "two-striped-grasshopper")
+command_wcr = make_cmd(files_list[12], "westcornrootworm")
+
+command_list = [command_blb, command_bca, command_bc, command_dg, command_gs, command_jb, command_ncr, command_sm, command_sgs, command_tca, command_ta, command_tsg, command_wcr]
+
+min_lon = -170
+max_lon = -52
+min_lat = 24
+max_lat = 83.5
+
+for command in command_list:
+    ncr_gdf_mid = gpd.GeoDataFrame.from_file('outputs/data/' + command[3] + '/mid.shp')
