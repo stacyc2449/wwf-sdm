@@ -12,11 +12,14 @@ library(lwgeom)
 library(usmap)
 library(rnaturalearth)
 library(spThin)
+library(yaml)
 
 # arguments: raw distribution file, prevalence (0, 1, 2), name
 args <- commandArgs(trailingOnly = TRUE)
 
 name <- args[2]
+
+config_data <- read_yaml("config.yaml")
 
 # preprocessing: US, low coordinate uncertainty, within worldclim time frame
 ncr_raw <- read.delim(args[1], sep="\t")
@@ -49,7 +52,7 @@ thin_results <- thin(
                      lat.col = "lat",
                      long.col = "lon",
                      spec.col = "species",
-                     thin.par = 5,
+                     thin.par = config_data$absence_gen$spatial_thin_distance_km,
                      reps = 10,
                      locs.thinned.list.return = TRUE,
                      write.files = FALSE)
