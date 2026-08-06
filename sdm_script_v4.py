@@ -48,156 +48,51 @@ from rasterio.windows import from_bounds
 from matplotlib.colors import ListedColormap, BoundaryNorm
 from sklearn.ensemble import VotingClassifier
 from rasterio.enums import Resampling
-import xarray as xr
 import regionmask
 import logging
+import yaml
+import sdm_func
+
+with open('config.yaml') as f:
+    config = yaml.safe_load(f)
 
 # logging
 logging.basicConfig(
-    filename='logs.log',
-    filemode='w',               # 'a' to append logs, 'w' to overwrite every run
+    filename=config['debug']['log_path'],
+    filemode=config['debug']['write'],               # 'a' to append logs, 'w' to overwrite every run
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO          # Capture INFO, WARNING, ERROR, and CRITICAL logs
 )
 
-files_list = ["inputs\\nst_pest_sightings\\bean_leaf_beetle_0003221-260623161305970\\0003221-260623161305970.csv", 
-              "inputs\\nst_pest_sightings\\bird_cherry_aphid_0003207-260623161305970\\0003207-260623161305970.csv",
-              "inputs\\nst_pest_sightings\\black_cutworm_0003212-260623161305970\\0003212-260623161305970.csv",
-            #   "nst_pest_sightings\\corn_leaf_aphid_0003215-260623161305970\\0003215-260623161305970.csv",
-              "inputs\\nst_pest_sightings\\differential_grasshopper0032387-260623161305970\\0032387-260623161305970.csv",
-            #   "nst_pest_sightings\\european_corn_borer0003385-260623161305970\\0003385-260623161305970.csv",
-              "inputs\\nst_pest_sightings\\green_stink_0005409-260623161305970\\0005409-260623161305970.csv",
-            #   "nst_pest_sightings\\hessian_fly_0003394-260623161305970\\0003394-260623161305970.csv",
-              "inputs\\nst_pest_sightings\\japanese_beetle_0003383-260623161305970\\0003383-260623161305970.csv",
-              "inputs\\nst_pest_sightings\\northern_corn_rootworm_0003360-260623161305970\\0003360-260623161305970.csv",
-            #   "nst_pest_sightings\\reg_legged_grasshopperobservations-752840.csv\\observations-752840.csv",
-              "inputs\\nst_pest_sightings\\seedcorn_maggot_0003200-260623161305970\\0003200-260623161305970.csv",
-              "inputs\\nst_pest_sightings\\southern_green_stink_0003348-260623161305970\\0003348-260623161305970.csv",
-              "inputs\\nst_pest_sightings\\three_cornered_alfalfa_0003390-260623161305970\\0003390-260623161305970.csv",
-              "inputs\\nst_pest_sightings\\true_armyworm0032387-260623161305970\\0032387-260623161305970.csv",
-              "input\\nst_pest_sightings\\two_striped_grasshopper0032397-260623161305970\\0032397-260623161305970.csv",
-              "inputs\\nst_pest_sightings\\western_corn_rootworm_0003372-260623161305970\\0003372-260623161305970.csv"
-              ]
 
-# Run the subprocess, R code to generate pseudo absences. Will be customized depending on the models
-def make_model_dict(name, model, model_class):
-    return {
-        "name": name,
-        "model": model,
-        "threshold": -1,
-        "auc": -1,
-        "maxsss": -1,
-        "frozen model": None,
-        "class": model_class
-    }
-
-####
-#### MAKE SURE TO CHANGE FOR CUSTOM R FILE PATH
-####
-def make_cmd(path, name):
-    return ["C:\\Program Files\\R\\R-4.4.1\\bin\\Rscript.exe",'pseudo_absence.R', 
-           path, name]
-
-def plotit(x, title, colors, cmap="Blues"):
-    x = np.asarray(x)
-    unique_vals = [0, 1, -9999]
-    n_val = len(unique_vals)
-    base = plt.get_cmap(cmap, n_val)
-    plt.imshow(x, cmap=cmap, interpolation='nearest')
-    
-    x_mapped = np.full(x.shape, np.nan)
-
-    for i, val in enumerate(unique_vals):
-        x_mapped[x == val] = i
-    
-    discrete_cmap = ListedColormap(colors)
-
-    bounds = np.arange(-0.5, n_val + 0.5, 1)
-    norm = BoundaryNorm(bounds, discrete_cmap.N)
-
-    im = plt.imshow(
-        x_mapped,
-        cmap=discrete_cmap,
-        norm=norm,
-        interpolation="nearest"
-    )
-
-    cbar = plt.colorbar(im, ticks=np.arange(n_val))
-    cbar.ax.set_yticklabels(unique_vals)
-
-    plt.title(title, fontweight="bold")
-    plt.savefig(title, dpi=300, bbox_inches='tight')
-    plt.show()
-
-
-command_blb = make_cmd(files_list[0], "beanleafbeetle")
-command_bca = make_cmd(files_list[1], "bircherryaphid")
-command_bc = make_cmd(files_list[2], "blackcutworm")
-command_dg = make_cmd(files_list[3], "differentialgrasshopper") 
-command_gs = make_cmd(files_list[4], "greenStink")
-command_jb = make_cmd(files_list[5], "japanesebeetle")
-command_ncr = make_cmd(files_list[6], "northerncornrootworm")
-command_sm = make_cmd(files_list[7], "seedcornmaggot")
-command_sgs = make_cmd(files_list[8], "southerngreenstink")
-command_tca = make_cmd(files_list[9], "threecornerneredalfalfa")
-command_ta = make_cmd(files_list[10], "truearmyworm")
-command_tsg = make_cmd(files_list[11], "two-striped-grasshopper")
-command_wcr = make_cmd(files_list[12], "westcornrootworm")
-
-command_list = [command_blb, command_bca, command_bc, command_dg, command_gs, command_jb, command_ncr, command_sm, command_sgs, command_tca, command_ta, command_tsg, command_wcr]
 
 # THE ORDER IS SIGNIFICANT!!!!
-ras_feats = ["inputs/chelsa_clim/current/CHELSA_bio02_1981-2010_V.2.1.tif", 
-             "inputs/chelsa_clim/current/CHELSA_bio04_1981-2010_V.2.1.tif", 
-             "inputs/chelsa_clim/current/CHELSA_bio06_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/current/CHELSA_bio14_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/current/CHELSA_bio15_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/current/CHELSA_bio19_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/current/CHELSA_fgd_1981-2010_V.2.1.tif",
-             "inputs/chelsa_clim/current/CHELSA_scd_1981-2010_V.2.1.tif"]
+ras_feats = glob.glob(config['current_climate']['bioclim_path'])
 
-print('There are ', len(ras_feats), ' raster features.')
 logging.info("Current raster features loaded: ".join(ras_feats))
 
 # loading future prediction
 
-training_feature_names = ["bio02", "bio04", "bio06", "bio14", "bio15", "bio19", "fgd", "scd"]
-
-min_lon = -170
-max_lon = -52
-min_lat = 24
-max_lat = 83.5
-
-downscale_factor = 0.25
-
-out_dir = "inputs\\chelsa_clim\\trim"
-
-def layer_path(period_dir, model_ssp, feature_name, period_suffix):
-    return rf"inputs\chelsa_clim\future\{model_ssp}\CHELSA_mpi-esm1-2-hr_ssp{model_ssp}_{feature_name}_{period_dir}_V.2.1.tif"
-
 future_ras_feats = []
 
-ssps_40 = ["126", "370", "585"]
-period_dir = "2041-2070"
-period_suffix = "2041-2070"
-
-for i, ssp in enumerate(ssps_40):
-    out_subdir = f"{out_dir}_{ssp}"
+for ssp_id, ssp_info in config['future_climate']['year_2070'].items():
+    ssp_path = ssp_info["path"]
+    out_subdir = ssp_info["trimmed_path"]
     os.makedirs(out_subdir, exist_ok=True)
         
     temp_future_ras_feats = []
-    for feature_name in training_feature_names:
-        in_path = layer_path(period_dir, ssp, feature_name, period_suffix)
 
-        
+    future_paths = glob.glob(ssp_path)
+    logging.info(future_paths)
+    for index, in_path in enumerate(future_paths):    
         with rasterio.open(in_path) as src:
             window = from_bounds(
-                            min_lon, min_lat, max_lon, max_lat,
+                            config["future_climate"]['boundary']["min_lon"], config["future_climate"]['boundary']["min_lat"], config["future_climate"]['boundary']["max_lon"], config["future_climate"]['boundary']["max_lat"],
                             transform=src.transform
                         ).round_offsets().round_lengths()
             
-            new_height = int(window.height * downscale_factor)
-            new_width = int(window.width * downscale_factor)
+            new_height = int(window.height * config["future_climate"]["downscale"])
+            new_width = int(window.width * config["future_climate"]["downscale"])
 
             data = src.read(
                 out_shape=(src.count, new_height, new_width), 
@@ -222,16 +117,16 @@ for i, ssp in enumerate(ssps_40):
 
             
 
-        out_path = os.path.join(out_subdir, f"future_{feature_name}.tif")
+        out_path = os.path.join(out_subdir, f"trimmed_{config["current_climate"]["vars"][index]}")
         with rasterio.open(out_path, "w", **profile) as dst:
             dst.write(band, 1)
-            dst.set_band_description(1, feature_name)
+            dst.set_band_description(1, in_path)
         temp_future_ras_feats.append(out_path)
 
     future_ras_feats.append(temp_future_ras_feats)
 
-window_lons = np.linspace(min_lon, max_lon, num=3540)
-window_lats = np.linspace(max_lat, min_lat, num = 1785)
+window_lons = np.linspace(config["future_climate"]["boundary"]["min_lon"], config["future_climate"]["boundary"]["max_lon"], num=3540)
+window_lats = np.linspace(config["future_climate"]["boundary"]["max_lat"], config["future_climate"]["boundary"]["min_lat"], num = 1785)
 
 
 land_polygons = regionmask.defined_regions.natural_earth_v5_0_0.land_110
@@ -242,10 +137,12 @@ land_mask = ~np.isnan(pred_mask)
 print("future ras feats loaded.")
 logging.info("Future raster features loaded.")
 
-for command in command_list:
-    logging.info(command[3])
+for species_id, species_config in config['species'].items():
+    species_name = species_config['name']
+    species_path = species_config['dist_path']
+    logging.info(species_name)
     try:
-        subprocess.run(command, capture_output=True, 
+        subprocess.run([config['absence_gen']['rscript'], config['absence_gen']['pseudo_absence_path'], species_path, species_name], capture_output=True, 
             text=True, check = True)
     except subprocess.CalledProcessError as e:
         print(f"R Script failed with exit code {e.returncode}")
@@ -254,8 +151,8 @@ for command in command_list:
 
     # ### Converting shapefiles (.shp) to geopandas dataframe
 
-    ncr_gdf_mid = gpd.GeoDataFrame.from_file('outputs/data/' + command[3] + '/mid.shp')
-    # ncr_gdf_high = gpd.GeoDataFrame.from_file('data/' + command[3] + '/high.shp')
+    ncr_gdf_mid = gpd.GeoDataFrame.from_file('outputs/data/' + species_name + '/mid.shp')
+    # ncr_gdf_high = gpd.GeoDataFrame.from_file('data/' + species_name + '/high.shp')
 
     # Checking duplicates and NA values. Coordinate reference system should ideally be epsg: 4326
     print("Coordinate reference system: {}".format(ncr_gdf_mid.crs))
@@ -297,7 +194,7 @@ for command in command_list:
     corr = np.abs(corr)
     plt.matshow(corr)
     plt.colorbar(label='Value Intensity')
-    plt.savefig("correlation_matrix " + command[3])
+    plt.savefig("outputs/correlations/correlation_matrix " + species_name)
 
 
     train_x_mid, test_x_mid, train_y_mid, test_y_mid = model_selection.train_test_split(train_xs_mid_clean, train_ys_mid_clean, test_size=0.25, random_state=42, stratify=train_ys_mid_clean)
@@ -315,7 +212,7 @@ for command in command_list:
     k = 10
     kf = model_selection.KFold(n_splits=k, shuffle=True, random_state=42)
 
-    rf = make_model_dict("random forest", RandomForestClassifier(
+    rf = sdm_func.make_model_dict("random forest", RandomForestClassifier(
     n_estimators=500,
     max_depth=10,
     min_samples_leaf=5,
@@ -323,15 +220,15 @@ for command in command_list:
     random_state=42,
     n_jobs=-1), "tree")
 
-    lda = make_model_dict("lda", LinearDiscriminantAnalysis(), "linear")
-    dtc = make_model_dict("decision tree", DecisionTreeClassifier(max_depth=6, min_samples_split=5, random_state=42), "tree")
-    lr = make_model_dict("log res glm", LogisticRegression(max_iter = 1000), "linear")
-    lr1 = make_model_dict("log res big", LogisticRegression(max_iter=5000), "linear")
-    xgb = make_model_dict("xg boost", XGBClassifier(), "tree")
+    lda = sdm_func.make_model_dict("lda", LinearDiscriminantAnalysis(), "linear")
+    dtc = sdm_func.make_model_dict("decision tree", DecisionTreeClassifier(max_depth=6, min_samples_split=5, random_state=42), "tree")
+    lr = sdm_func.make_model_dict("log res glm", LogisticRegression(max_iter = 1000), "linear")
+    lr1 = sdm_func.make_model_dict("log res big", LogisticRegression(max_iter=5000), "linear")
+    xgb = sdm_func.make_model_dict("xg boost", XGBClassifier(), "tree")
     mars_model = make_pipeline(SplineTransformer(degree=1, n_knots=10, include_bias=False), LogisticRegression())
-    mars = make_model_dict("mars", mars_model, "other")
-    me = make_model_dict("maxent", MaxentModel(), "other")
-    gam = make_model_dict("log gam", LogisticGAM(s(0) + s(1) + s(2), lam = 10), "linear")
+    mars = sdm_func.make_model_dict("mars", mars_model, "other")
+    me = sdm_func.make_model_dict("maxent", MaxentModel(), "other")
+    gam = sdm_func.make_model_dict("log gam", LogisticGAM(s(0) + s(1) + s(2), lam = 10), "linear")
     models = [rf, lda, dtc, lr, lr1, xgb, mars, me]
 
     
@@ -456,7 +353,7 @@ for command in command_list:
     # we use votingclassifier, but since we already have pretrained models, we use frozen classifiers as detailed here:
     # https://github.com/scikit-learn/scikit-learn/issues/12297
     
-    ssp = ['126', '245', '370', '585']
+    ssp = ['126', '370', '585']
 
     future_target_xss = []
     future_raster_infos = []
@@ -557,16 +454,16 @@ for command in command_list:
         new_pred_to_write = np.where(np.isnan(masked_pred_to_write), -9999, pred_to_write)
 
 
-        os.makedirs("outputs/" + command[3], exist_ok=True)
-        with rasterio.open("outputs/" + command[3] + "/prediction_" + command[3] + "_" + ssp[index] + "_ensemble.tif", "w", **profile) as dst:
+        os.makedirs("outputs/predictions/" + species_name, exist_ok=True)
+        with rasterio.open("outputs/predictions/" + species_name + "/prediction_" + species_name + "_" + ssp[index] + "_ensemble.tif", "w", **profile) as dst:
             dst.write(new_pred_to_write, 1)
             dst.set_band_description(1, "prediction")
 
-    # distr_rf_pred_245 = rasterio.open("outputs/" + command[3] + "/prediction_" + command[3] + "_126" + "_ensemble.tif").read(1)
-    # plotit(distr_rf_pred_245, command[3] + ', 126', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")
+    # distr_rf_pred_245 = rasterio.open("outputs/" + species_name + "/prediction_" + species_name + "_126" + "_ensemble.tif").read(1)
+    # sdm_func.plotit(distr_rf_pred_245, species_name + ', 126', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")
 
-    # distr_rf_pred_245 = rasterio.open("outputs/" + command[3] + "/prediction_" + command[3] + "_370" + "_ensemble.tif").read(1)
-    # plotit(distr_rf_pred_245, command[3] + '370', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")
+    # distr_rf_pred_245 = rasterio.open("outputs/" + species_name + "/prediction_" + species_name + "_370" + "_ensemble.tif").read(1)
+    # sdm_func.plotit(distr_rf_pred_245, species_name + '370', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")
 
-    # distr_rf_pred_245 = rasterio.open("outputs/" + command[3] + "/prediction_" + command[3] + "_585" + "_ensemble.tif").read(1)
-    # plotit(distr_rf_pred_245, command[3] + '585', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")
+    # distr_rf_pred_245 = rasterio.open("outputs/" + species_name + "/prediction_" + species_name + "_585" + "_ensemble.tif").read(1)
+    # sdm_func.plotit(distr_rf_pred_245, species_name + '585', ["mediumseagreen", "orangered", "lightsteelblue"], cmap="Greens")
