@@ -1,63 +1,9 @@
 # Species Distribution Modelling of common pests
 Project looks at most detrimental pests (measured by bushels lost between 2022 through 2024) of corn, soy, and wheat in the U.S.
 
-### Completed:
-**Models implemented:**  
-- RF
-- FDA
-- GAM (`pygam`)
-- CTA
-- RF
-- GLM (~~`statsmodels`~~ `scikit pipeline`)
-- MARS (`py-earth`)
-- GBM
-- MaxEnt (`elapid`?)
-
-Embed R scripts, vary the number of absences generated - this mightve actually been detrimental to accuracy
-
-Resolve ocean presence generation
-
-Implement thresholds with max sss
-
-Find a method to choose models for ensemble modelling - auc and tss
-
-Assign classifiers to each type of absence generation
-
-Ensemble modelling - how do you choose 3 models?
-
-Display data better 
-
-Sampling bias?
-
-myabe also thin the presence sightings within ~~10km~~ 5 km of each other?
-
-check pearsons correlation coeeff
-
-Investigating field studies of NST efficacy in areas with known infestations (sorta done? will end up being done in discussion)
-
-check feature weight (i only did for tree and linear models)
-
-Make gif setup of the spreading range over the course of the next few decades 
-
-clean up the month range of each pest based on crop
-
-current bio vars are not that cooked, but try the new ones (Including soil/more bioclimactic variables? out of the backburner!)
-
-I really don't like modifying the R script to include nonexistent uncertainty.... but that is the only way seedcorn maggot sightings will work...
-
-Solution: run all of them, with seedcorn maggots being the only exception
-
-### To Do:
-
-develop into a usable tool? where you dont have to understand the entire codebase in order to use it
-
-
-### Backburner
-Possibly generate pseudo absence points using environmentally stratified methods   
-   
-continuous boyce index and how that might be helpful 
-
-spatial blocking cross validation, possibly through verde scikit - this may reduce sampling bias
+### Using this repository
+This repository features the codebase and final output data, for storage reasons.
+In order to obtain input data, download it from [here]()
 
 ### Notes/Discussion
 1. We have chosen pests that have caused more than 1 million bushels lost in 2022, 2023, and 2024. Some of these listed pests from [Crop Protection Network](https://cropprotectionnetwork.org/) are more general clades; we distinguished between them as much as possible and isolated the most detrimental species in these groups
@@ -69,15 +15,16 @@ spatial blocking cross validation, possibly through verde scikit - this may redu
 4. Overwintering conditions were difficult to isolate (we look at this for NST efficacy), in addition to general ranges. Some publications test for the survivability of insects in extreme limits of overwintering conditions, but future prediction data is not precise and accurate enough to predict a one-two days of extreme freeze. Because of this, we determine the ranges of these pests by sightings, accumulated from GBIF which includes samples from universities, museums, and iNaturalist. We filter for winter months and early-season planting to isolate the "overwintering" ranges for these pests.   
 We choose to only stick with GBIF datasets because they were the most extensive, and already include large datasets such as iNaturalist sightings
 
-5. We use climactic variables from 1980 (or 1970?) and onwards - this does not solely reflect overwintering conditions, but these species were found to be present year round in the overwintered locations based on month filtering and observation. This would show that the lowest precipitation and coldest temperatures would still be relevant to the overwintering of insects here
+5. We use climactic variables from 1980 and onwards, specifically ones that would be related to overwintering conditions in North America
 
 6. We should put more emphasis on southern-residing pests, since these are most likely to spread to the midwest, with the most crop production
 
 ### Goals
 The goal is to predict the new expanded range of overwintering sites for common pests, and compare it with areas where neonics application is largely unregulated and legalized. This will provide new recommended places where neonics should be, and shouldn't be applied, because of the detriment that neonics contribute to the environment, such as pollinator death and decreased biodiversity, as well as making it more likely for common pests to develop a resistance to these insecticides.
 
-### Using this repository
-This repository features the codebase and a very sparse amount of data. The data will be made available soon, it is currently absent for pushing/pulling efficiency. 
+It is also important to note that neonics may not even be necessary - multiple studies have shown little to no difference in crop yield with applications of seed treatments especially in northern regions. Read more from [WWF](https://www.worldwildlife.org/publications/neonicotinoid-seed-treatments-in-north-american-row-crops-a-literature-review-of-yield-and-profitability-outcomes/).
 
 
-Updated July 24, 2026
+
+
+Updated August 6, 2026
