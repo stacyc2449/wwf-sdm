@@ -2,8 +2,44 @@
 Project looks at most detrimental pests (measured by bushels lost between 2022 through 2024) of corn, soy, and wheat in the U.S.
 
 ### Using this repository
+If you have little or no experience working with Python or R, start here:   
+- [Python in VS Code](https://code.visualstudio.com/docs/python/python-tutorial)
+- [Jupyter Notebooks in VS Code](https://code.visualstudio.com/docs/datascience/jupyter-notebooks)
+- [R in VS Code](https://code.visualstudio.com/docs/languages/r)
+#### Installing dependencies:
+**Python dependencies**    
+In a virtual environment, install `requirements.txt`. Python 3.12.3 works.   
+
+**R dependencies**
+In your R console, install the following packages:
+- `install.packages("terra")`
+- `install.packages("geodata")`
+- `install.packages("dismo")`
+- `install.packages("sf")`
+- `install.packages("ggplot2")`
+- `install.packages("lwgeom")`
+- `install.packages("usmap")`
+- `install.packages("rnaturalearth")`
+- `install.packages("spThin")`
+- `install.packages("yaml")`
+
+#### Data
 This repository features the codebase and final output data, for storage reasons.
-In order to obtain input data, download it from [here]()
+In order to obtain input data, download it from [here](https://drive.google.com/drive/folders/1rOWuLv6yuh7KTDzeth18l6_wlEYmZRB0?usp=drive_link)
+
+Unzip the files, and make sure the input folder is inside the repository.
+
+#### Configurations
+It is best to modify the YAML file directly (`config.yaml`) in order to add more species, add new climate variables, add new climate ssps, and modify other settings. Follow the structure in the config file.
+
+#### Running code
+Run `sdm_script_v4.py` in order for full modeling for future pest distributions of all pests in `config.yaml`. If you are solely looking to run code to find current ranges of pests, run `sdm_current.py`. For solely feature correlation generation, run `sdm_corr_generation.py`, with correlation outputs in `corr.log`.
+
+#### Outputs
+The code will output the following:   
+- Correlation matrices as pngs (`outputs/correlations/`)
+- Predictions as geotifs (`outputs/predictions/<species_name>/`)
+- Logs of model TSS and ROC-AUC scores, model selection, etc. (`logs.log`)
 
 ### Notes/Discussion
 1. We have chosen pests that have caused more than 1 million bushels lost in 2022, 2023, and 2024. Some of these listed pests from [Crop Protection Network](https://cropprotectionnetwork.org/) are more general clades; we distinguished between them as much as possible and isolated the most detrimental species in these groups
