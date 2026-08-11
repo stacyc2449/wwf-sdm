@@ -60,7 +60,6 @@ The goal is to predict the new expanded range of overwintering sites for common 
 
 It is also important to note that neonics may not even be necessary - multiple studies have shown little to no difference in crop yield with applications of seed treatments especially in northern regions. Read more from [WWF](https://www.worldwildlife.org/publications/neonicotinoid-seed-treatments-in-north-american-row-crops-a-literature-review-of-yield-and-profitability-outcomes/).
 
+If you have questions about this project, [contact me](mailto:stacky@mit.edu)!
 
-
-
-Updated August 6, 2026
+Updated August 11, 2026
